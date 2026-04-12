@@ -7,3 +7,11 @@ __pycache__/
 logs/
 python/
 !pretrained
+
+# Pixi
+.pixi/
+pixi.lock
+
+# Omniverse / Isaac
+outputs/
+.thumbs/

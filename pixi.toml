@@ -1,0 +1,41 @@
+[workspace]
+name = "sharpa-rl-lab"
+version = "1.0.1"
+description = "SharpaWave RL sim2real rotation demo with Isaac Lab"
+channels = ["conda-forge", "nvidia"]
+platforms = ["linux-64"]
+
+[dependencies]
+python = "3.11.*"
+pip = "*"
+
+[tasks]
+# Environment setup
+install-deps = """pip install isaaclab[isaacsim,all]==2.3.2.post1 --extra-index-url https://pypi.nvidia.com && \
+pip install torch==2.7.0+cu128 torchvision==0.22.0+cu128 torchaudio==2.7.0+cu128 --index-url https://download.pytorch.org/whl/cu128 && \
+pip install tensorboardX omegaconf termcolor && \
+pip install -e ."""
+
+# Step 1: Generate grasp cache
+gen-grasp = "python rl_isaaclab/scripts/gen_grasp.py --task Isaac-Inhand-Rotate-Grasp-Sharpa-Wave-v0 --headless"
+
+# Step 2: Train base PPO policy
+train = "python rl_isaaclab/scripts/train.py --task Isaac-Inhand-Rotate-Sharpa-Wave-v0 --headless --num_envs 16384"
+
+# Step 2b: Train with fewer envs (for testing / lower VRAM)
+train-small = "python rl_isaaclab/scripts/train.py --task Isaac-Inhand-Rotate-Sharpa-Wave-v0 --headless --num_envs 4096"
+
+# Step 3: Distillation (ProprioAdapt stage 2) - pass --load_path after --
+train-distill = "python rl_isaaclab/scripts/train.py --task Isaac-Inhand-Rotate-Sharpa-Wave-v0 --headless --algorithm ProprioAdapt"
+
+# Step 4: Visualize policy - pass --load_path after --
+play = "python rl_isaaclab/scripts/play.py --task Isaac-Inhand-Rotate-Sharpa-Wave-v0 --num_envs 16"
+
+# Visualize distilled policy
+play-distill = "python rl_isaaclab/scripts/play.py --task Isaac-Inhand-Rotate-Sharpa-Wave-v0 --num_envs 16 --algorithm ProprioAdapt"
+
+# TensorBoard
+tb = "tensorboard --logdir logs/"
+
+# Quick smoke test (very short training to verify pipeline)
+smoke-test = "python rl_isaaclab/scripts/train.py --task Isaac-Inhand-Rotate-Sharpa-Wave-v0 --headless --num_envs 1024 --max_agent_steps 100000"

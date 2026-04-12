@@ -1,0 +1,7 @@
+id	date	milestone	description	num_envs	max_steps	duration_min	fps	best_reward	mean_reward_final	vram_gb	status	decision	notes
+000	2026-04-11	M1	env_bootstrap	-	-	15	-	-	-	-	success	KEEP	pixi+pip Isaac Lab 2.3.2 on RTX 5090
+001	2026-04-11	M1	grasp_cache_gen	16384	-	19	-	-	-	13.0	success	KEEP	50k grasps collected; scale_range=[0.5,0.5,1]
+002	2026-04-11	M1	smoke_test_ppo	1024	100000	0.5	8150	2.69	-4.07	3.7	success	KEEP	fixed import_gym + termcolor + device mismatch
+003	2026-04-11	M1	full_ppo_training	16384	300000000	91	54979	1130.05	1088.09	12.5	success	KEEP	300M steps; checkpoints at logs/debug/2026-04-11_21-50-19/stage1_nn/
+004	2026-04-12	M1	eval_ours_stage1	256	-	0.7	-	1327.56	1272.79	3.2	success	KEEP	256 ep; 99.6% full-ep rate; median 1288.75
+005	2026-04-12	M1	eval_pretrained_stage2	256	-	0.7	-	1168.48	1040.63	3.2	success	KEEP	256 ep; 100% full-ep rate; ProprioAdapt checkpoint
