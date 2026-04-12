@@ -103,9 +103,12 @@ class ProprioAdapt(object):
         _t = time.time()
         _last_t = time.time()
 
+        max_agent_steps = self.ppo_config.get('max_agent_steps', int(1e9))
+
         obs_dict = self.env.reset()
         self.agent_steps += self.batch_size
-        while self.agent_steps <= 1e9:
+        self.last_loss = 0.0
+        while self.agent_steps <= max_agent_steps:
             input_dict = {
                 'obs': self.running_mean_std(obs_dict['obs']).detach(),
                 'priv_info': obs_dict['priv_info'],
@@ -116,6 +119,7 @@ class ProprioAdapt(object):
             self.optim.zero_grad()
             loss.backward()
             self.optim.step()
+            self.last_loss = loss.item()
 
             mu = mu.detach()
             mu = torch.clamp(mu, -1.0, 1.0)
@@ -150,12 +154,17 @@ class ProprioAdapt(object):
             info_string = f'Agent Steps: {int(self.agent_steps // 1e6):04}M | FPS: {all_fps:.1f} | ' \
                           f'Last FPS: {last_fps:.1f} | ' \
                           f'Mean Rewards: {mean_rewards:.2f} | ' \
-                          f'Current Best: {self.best_rewards:.2f}'
+                          f'Current Best: {self.best_rewards:.2f} | ' \
+                          f'Loss: {self.last_loss:.5f}'
             tprint(info_string)
+
+        # save final
+        self.save(os.path.join(self.nn_dir, 'last'))
 
     def log_tensorboard(self):
         self.writer.add_scalar('episode_rewards/step', self.mean_eps_reward.get_mean(), self.agent_steps)
         self.writer.add_scalar('episode_lengths/step', self.mean_eps_length.get_mean(), self.agent_steps)
+        self.writer.add_scalar('losses/adapt_mse', self.last_loss, self.agent_steps)
         for k, v in self.direct_info.items():
             self.writer.add_scalar(f'{k}/frame', v, self.agent_steps)
 

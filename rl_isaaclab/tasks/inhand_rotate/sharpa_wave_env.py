@@ -109,6 +109,11 @@ class SharpaWaveInhandRotateEnv(DirectRLEnv):
         scale_ids = torch.linspace(0, self.cfg.scale_range[2]-1, self.cfg.scale_range[2], device=self.device, dtype=torch.int32).reshape(-1, 1)
         scale_ids = scale_ids.repeat(1, math.ceil(self.num_envs/self.cfg.scale_range[2]))
         self.scale_ids = scale_ids.reshape(-1, 1)[:self.num_envs]
+        # Per-env actual scale value. Matches linspace ordering used in modified_events.randomize_rigid_body_scale
+        scale_values = torch.linspace(self.cfg.scale_range[0], self.cfg.scale_range[1], self.cfg.scale_range[2], device=self.device)
+        self.env_scales = scale_values[self.scale_ids.flatten().long()]  # shape [num_envs]
+        # Expose object scale as priv_info dim 8 (index 8 is the 9th slot)
+        self.priv_info_buf[:, 8] = self.env_scales
         if self.cfg.grasp_cache_path:
             self.saved_grasping_states = torch.from_numpy(np.load(f"{self.cfg.grasp_cache_path}_{self.cfg.scale_range[0]}-{self.cfg.scale_range[1]}-{self.cfg.scale_range[2]}.npy")).float().to(self.device)
             self.bucket_grasp = int(self.saved_grasping_states.shape[0] / self.cfg.scale_range[2])

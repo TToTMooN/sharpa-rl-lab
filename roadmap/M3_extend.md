@@ -66,15 +66,29 @@ Reuse the SharpaWave hand but change the task.
 - **Fingers**: 5 (thumb 3 DOF, index 3 DOF, middle/ring/pinky 2 DOF each)
 - **Tactile**: 120-300 three-axis sensors per fingertip
 - **Grip force**: 80N peak; 5kg single finger, 24kg full hand
-- **Availability**: Product exists; [roboterax GitHub](https://github.com/roboterax) has humanoid URDF but **no public xhand URDF/USD yet**
 
-### xhand path
-1. **Blocker**: Need xhand URDF/USD. Either:
-   - Contact RoboEra for URDF
-   - Build URDF from datasheet dimensions
-   - Use any public 12-DOF dex hand as a stand-in (e.g., Shadow Hand, Allegro) first
+### xhand assets — available locally
+User provided the following in `~/Downloads/`:
+- `XHAND1_URDF_ver 1.3.zip` — right hand URDF (7.2 MB)
+- `URDF_LH1.1.zip` — left hand URDF (6.2 MB)
+- `xhand_control_sdk_py_x86_64_v117.zip` — Python SDK
+- `xhand_control_sdk_x86_64_v141.tar.gz` — C++ SDK
+- `xhand_control_ros_x86_64_v123.tar.gz`, `xhand_control_ros2_x86_64_v132.tar.gz` — ROS/ROS2 control
+- `xhand_v1.1.15.0_release_20250625.deb` — driver
+- Multiple PDF docs (SDK usage, control, interface specs in CN/EN)
 
-2. **Realistic first target**: **Allegro Hand** (16 DOF, 4 fingers, widely available in Isaac Lab) — proves the pipeline is portable, unblocks xhand later
+Additional reference: [x-robotics-lab/dexscrew xhand_left](https://github.com/x-robotics-lab/dexscrew/tree/main/assets/xhand_left) — pre-processed URDF + meshes for Isaac Lab use, good template for how to structure the asset import.
+
+### xhand integration path (once M2 is done)
+1. Unzip `XHAND1_URDF_ver 1.3.zip` → `assets/xhand/`
+2. Convert URDF to USD for Isaac Lab (use `isaaclab convert_urdf`)
+3. Reference dexscrew's structure for how Isaac Lab loads xhand
+4. Build `XHAND = HandSpec(...)` with 12 DOF
+5. Regenerate grasp cache for cylinder
+6. Train PPO, distill (using M2 recipe)
+
+### Allegro fallback (only if xhand integration hits blockers)
+**Allegro Hand** — 16 DOF, 4 fingers, widely available in Isaac Lab. Useful if xhand integration turns out harder than expected, but since we have xhand URDFs locally we should try xhand first.
 
 ### M3-B experiment sequence (Allegro as proof-of-concept)
 
