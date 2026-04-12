@@ -43,10 +43,14 @@ The task: **continuous Z-axis rotation of a cylinder** held by the 22-DOF Sharpa
 - [x] **EXP-007**: Evaluate our stage-2 — mean 1137.66, **beats pretrained (1040.63) by 9.3%**
 
 ### Phase 3: Train multi-scale variant
-- [ ] **EXP-008**: Generate grasp cache for scale_range=[0.4, 0.6, 8]
-- [ ] **EXP-009**: Full PPO training with multi-scale config
+- [ ] **EXP-008** (in progress): Generate grasp cache for scale_range=[0.4, 0.6, 8]
+  - Changed `scale_range` in both `sharpa_wave_env_cfg.py` and `sharpa_wave_grasp_env_cfg.py`
+  - Will produce `cache/sharpa_grasp_linspace_0.4-0.6-8.npy` (matching existing)
+- [ ] **EXP-009**: Full PPO training with multi-scale config (300M steps)
+  - Harder task: policy must generalize across 8 object sizes (0.4, 0.43, 0.46, ..., 0.6 scale)
+  - Expect longer convergence and possibly lower peak reward than single-scale
 - [ ] **EXP-010**: ProprioAdapt distillation for multi-scale
-- [ ] **EXP-011**: Evaluate against `pretrained/0.4-0.6-8.pth`
+- [ ] **EXP-011**: Evaluate our multi-scale stage-2 vs pretrained/0.4-0.6-8.pth
 
 ### Phase 4: Comparison & documentation
 - [ ] Side-by-side reward curves: our training vs pretrained eval
