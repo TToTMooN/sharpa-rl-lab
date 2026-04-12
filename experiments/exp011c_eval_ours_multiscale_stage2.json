@@ -1,0 +1,14 @@
+{
+  "checkpoint": "logs/debug/2026-04-12_00-51-05/stage2_nn/best.pth",
+  "eval_name": "exp011c_ours_multiscale_stage2",
+  "num_episodes": 256,
+  "num_envs": 256,
+  "mean_reward": 878.1004638671875,
+  "std_reward": 269.3843994140625,
+  "min_reward": 2.6492977142333984,
+  "max_reward": 1085.3499755859375,
+  "median_reward": 959.2447509765625,
+  "mean_length": 369.48828125,
+  "max_length": 399.0,
+  "full_episode_rate": 0.921875
+}

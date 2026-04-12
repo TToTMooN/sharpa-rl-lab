@@ -7,9 +7,11 @@ Reinforcement learning sim2real pipeline for **in-hand object rotation** using t
 **Goal**: Learn and generalize the SHARPA RL library as a tool. Reproduce their published results first, then extend.
 
 ## Status
-- **M1 single-scale [0.5]**: ✅ Reproduced and exceeded. Our stage-2 eval reward **1137.66** vs pretrained **1040.63** (+9.3%). See `roadmap/M1_reproduce_sharpa.md`.
-- **M1 multi-scale [0.4, 0.6, 8]**: in progress (EXP-008+).
-- **M2-M4**: planned.
+- **M1 single-scale [0.5]**: ✅ Reproduced and exceeded. Our stage-2 eval reward **1137.66** vs pretrained **1040.63** (+9.3%).
+- **M1 multi-scale [0.4, 0.6, 8]**: ⚠️ Partial. Our stage-1 PPO **1064.64** beats pretrained stage-2 **950.38** by 12%, but our distilled stage-2 **878.10** underperforms pretrained by 7.6%. **Distillation is the bottleneck.**
+- **M2 ablation** (next): Investigate distillation hyperparameters, loss formulation, and training duration to close the gap.
+- **M3-M4**: planned.
+- See `roadmap/M1_reproduce_sharpa.md` for full detail.
 
 ## Architecture
 

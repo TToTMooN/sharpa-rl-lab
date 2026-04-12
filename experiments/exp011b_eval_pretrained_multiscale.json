@@ -1,0 +1,14 @@
+{
+  "checkpoint": "pretrained/0.4-0.6-8.pth",
+  "eval_name": "exp011b_pretrained_multiscale",
+  "num_episodes": 256,
+  "num_envs": 256,
+  "mean_reward": 950.37939453125,
+  "std_reward": 295.8960266113281,
+  "min_reward": -4.36370849609375,
+  "max_reward": 1188.0330810546875,
+  "median_reward": 1046.8592529296875,
+  "mean_length": 364.7890625,
+  "max_length": 399.0,
+  "full_episode_rate": 0.90625
+}

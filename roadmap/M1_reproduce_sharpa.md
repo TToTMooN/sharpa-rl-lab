@@ -44,9 +44,9 @@ The task: **continuous Z-axis rotation of a cylinder** held by the 22-DOF Sharpa
 
 ### Phase 3: Train multi-scale variant
 - [x] **EXP-008**: Generate grasp cache for scale_range=[0.4, 0.6, 8] — 50k grasps in ~20 min
-- [x] **EXP-009**: Full PPO training with multi-scale config — 300M steps, 94 min, best 850.81 (~25% lower than single-scale)
-- [ ] **EXP-010** (in progress): ProprioAdapt distillation for multi-scale (60M steps)
-- [ ] **EXP-011**: Evaluate our multi-scale stage-2 vs pretrained/0.4-0.6-8.pth
+- [x] **EXP-009**: Full PPO training multi-scale — 300M steps, 94 min, best 850.81
+- [x] **EXP-010**: ProprioAdapt distillation multi-scale — **plateaued at training mean 186** (1B steps, 5h). CLI `--max_agent_steps` is ignored for ProprioAdapt. Multi-scale distill is much harder than single-scale.
+- [x] **EXP-011**: Eval triad — our stage-1 **1064.64** (beats pretrained by 12%), pretrained stage-2 **950.38**, our stage-2 **878.10** (−7.6% vs pretrained)
 
 ### Phase 4: Comparison & documentation
 - [ ] Side-by-side reward curves: our training vs pretrained eval
@@ -70,6 +70,23 @@ At ~52k FPS with 16384 envs on RTX 5090:
 - 300M steps ≈ 5,770 seconds ≈ **~96 minutes** per full run
 - Grasp cache generation: ~19 min
 - ProprioAdapt distillation: TBD (typically faster than stage 1)
+
+## M1 Final Status
+
+### Single-scale [0.5, 0.5, 1]: ✅ REPRODUCED + IMPROVED
+- Our stage-1 PPO: 1272.79 (N/A — no stage-1 pretrained to compare)
+- Our stage-2 distill: **1137.66** vs pretrained **1040.63** → **+9.3%**
+
+### Multi-scale [0.4, 0.6, 8]: ⚠️ PARTIAL
+- Our stage-1 PPO: **1064.64** vs pretrained stage-2 **950.38** → +12% (cross-stage)
+- Our stage-2 distill: **878.10** vs pretrained stage-2 **950.38** → **−7.6%**
+- **Gap**: distillation underperforms. Stage-1 training works great; distillation is the bottleneck.
+
+### Hypotheses for distillation gap (→ M2 ablations)
+1. LR 3e-4 may be too small/large for multi-scale; needs sweep
+2. `--max_agent_steps` flag is ignored by ProprioAdapt loop — need to know actual training duration Sharpa used
+3. Multi-scale dynamics may require scale info in priv_info (currently priv_info has pos, friction, mass, com but no scale)
+4. Sharpa may use a different distillation loss (e.g. action-matching instead of embedding-matching)
 
 ## Observations — M1 (single-scale) complete
 
