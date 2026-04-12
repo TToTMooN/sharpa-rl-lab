@@ -8,3 +8,4 @@ id	date	milestone	description	num_envs	max_steps	duration_min	fps	best_reward	me
 006	2026-04-12	M1	distill_stage2	16384	32000000	22	55600	992.39	970.25	12.8	success	KEEP	killed at 32M (plateau); stage2_nn/best.pth; trained mean 970, best 992
 007	2026-04-12	M1	eval_ours_stage2	256	-	0.7	-	1221.92	1137.66	3.2	success	KEEP	256 ep; 100% full-ep rate; BEATS pretrained by 9.3%
 008	2026-04-12	M1	grasp_cache_multiscale	16384	-	20	-	-	-	13.2	success	KEEP	50k grasps across 8 scales [0.4..0.6]; took longer than single-scale because harder to stabilize
+009	2026-04-12	M1	full_ppo_multiscale	16384	300000000	94	51989	850.81	806.28	12.5	success	KEEP	300M steps multi-scale; ~25% lower reward than single-scale (harder task); logs/debug/2026-04-12_00-51-05

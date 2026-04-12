@@ -95,5 +95,25 @@ Gravity curriculum caused expected dips mid-training. Checkpoints saved every 50
 | Our ProprioAdapt stage-2 (EXP-007) | 2 | **1137.66** | 79.2 | 1142.61 | **100%** |
 | Pretrained stage-2 (EXP-005) | 2 | 1040.63 | 99.1 | 1052.64 | 100% |
 
-**M1 milestone REPRODUCED** — our end-to-end pipeline (PPO stage 1 → ProprioAdapt stage 2) matches and exceeds the shipped pretrained policy's performance on the `0.5-0.5-1` scale config.
+**M1 single-scale milestone REPRODUCED** — our end-to-end pipeline (PPO stage 1 → ProprioAdapt stage 2) matches and exceeds the shipped pretrained policy's performance on the `0.5-0.5-1` scale config.
 **Next**: EXP-008 — generate grasp cache for multi-scale config [0.4, 0.6, 8] to reproduce the harder pretrained.
+
+---
+
+## EXP-008: Multi-Scale Grasp Cache
+**Hypothesis**: Multi-scale grasp gen will take longer than single-scale because 8 different object sizes have to stabilize.
+**Outcome**: 50k grasps in ~20 min. Initial 5 minutes had 0 successes (all scales needed time to stabilize full-length episodes), then rapid fill once first scale succeeded. Final fill: scales finish sequentially as each hits 6250 grasps (50000/8).
+
+---
+
+## EXP-009: Full PPO Training — Multi-Scale
+**Hypothesis**: Multi-scale task is harder than single-scale → expect lower peak reward and similar or slower convergence.
+**Outcome**: 300M steps in **94 min** at 52k FPS. Best reward **850.81**, final mean **806.28**. ~25% lower than single-scale's 1130 — confirms multi-scale is harder.
+**Checkpoints**: `logs/debug/2026-04-12_00-51-05/stage1_nn/{best,last}.pth`
+**Training curve (binned 20M)**:
+- 131M: reward 572 (checkpoint saved)
+- 196M: reward 726
+- 262M: reward 770
+- 300M: final 806, best 850.81
+Reward climb more gradual than single-scale, never reaches 1000.
+**Next**: EXP-010 — ProprioAdapt distillation (60M steps) on this checkpoint.
