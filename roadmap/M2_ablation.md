@@ -4,6 +4,18 @@
 
 **Depends on**: M1 (need a trained baseline to ablate against)
 
+## Reward structure (for reference)
+
+The total reward combines 6 terms in `sharpa_wave_env.py::compute_rewards`:
+1. **rotate_reward** — projection of angular velocity onto rotation axis (Z), clipped to [angvel_clip_min, angvel_clip_max]. Main signal.
+2. **object_linvel_penalty** — penalizes object translation
+3. **pos_diff_penalty** — penalizes hand joint deviation from default pose
+4. **torque_penalty** — L2 torque penalty
+5. **work_penalty** — `(torque * vel).sum()^2`
+6. **object_pos_diff** — `1 / (distance_from_default + eps)` reward (keep object near hand center)
+
+Per-step metrics logged to tensorboard: rotate_reward, penalties, roll/pitch/yaw, gravity_x/y/z.
+
 ## Ablation experiments (planned)
 
 | Experiment | What to disable/change | Expected impact | Why it matters |

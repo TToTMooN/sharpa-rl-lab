@@ -39,3 +39,9 @@ tb = "tensorboard --logdir logs/"
 
 # Quick smoke test (very short training to verify pipeline)
 smoke-test = "python rl_isaaclab/scripts/train.py --task Isaac-Inhand-Rotate-Sharpa-Wave-v0 --headless --num_envs 1024 --max_agent_steps 100000"
+
+# Evaluate a trained policy quantitatively (pass --load_path, --algorithm, --eval_name after --)
+eval = "python rl_isaaclab/scripts/eval.py --task Isaac-Inhand-Rotate-Sharpa-Wave-v0 --headless --num_envs 256 --num_episodes 256"
+
+# Summarize experiments.tsv
+analyze = "python experiments/analyze.py"
