@@ -39,6 +39,6 @@ Each milestone gets its own file. Experiments in `experiments/experiments.tsv` r
 | ID | Title | Status | Experiments |
 |----|-------|--------|-------------|
 | M1 | [Reproduce SHARPA RL results](M1_reproduce_sharpa.md) | in_progress | EXP-000..003+ |
-| M2 | [Understand & ablate components](M2_ablation.md) | planned | — |
-| M3 | [Extend tasks & objects](M3_extend.md) | planned | — |
+| M2 | [Close distillation gap + ablate components](M2_ablation.md) | planned | — |
+| M3 | [Generalize — new tasks + new hands (xhand, Allegro)](M3_extend.md) | planned | — |
 | M4 | [Sim2real & deployment](M4_sim2real.md) | planned | — |
