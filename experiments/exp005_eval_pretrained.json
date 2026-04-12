@@ -1,0 +1,14 @@
+{
+  "checkpoint": "pretrained/0.5-0.5-1.pth",
+  "eval_name": "exp005_pretrained",
+  "num_episodes": 256,
+  "num_envs": 256,
+  "mean_reward": 1040.6309814453125,
+  "std_reward": 99.05355072021484,
+  "min_reward": 113.35446166992188,
+  "max_reward": 1168.475341796875,
+  "median_reward": 1052.6429443359375,
+  "mean_length": 399.0,
+  "max_length": 399.0,
+  "full_episode_rate": 1.0
+}

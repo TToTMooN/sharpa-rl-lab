@@ -5,3 +5,5 @@ id	date	milestone	description	num_envs	max_steps	duration_min	fps	best_reward	me
 003	2026-04-11	M1	full_ppo_training	16384	300000000	91	54979	1130.05	1088.09	12.5	success	KEEP	300M steps; checkpoints at logs/debug/2026-04-11_21-50-19/stage1_nn/
 004	2026-04-12	M1	eval_ours_stage1	256	-	0.7	-	1327.56	1272.79	3.2	success	KEEP	256 ep; 99.6% full-ep rate; median 1288.75
 005	2026-04-12	M1	eval_pretrained_stage2	256	-	0.7	-	1168.48	1040.63	3.2	success	KEEP	256 ep; 100% full-ep rate; ProprioAdapt checkpoint
+006	2026-04-12	M1	distill_stage2	16384	32000000	22	55600	992.39	970.25	12.8	success	KEEP	killed at 32M (plateau); stage2_nn/best.pth; trained mean 970, best 992
+007	2026-04-12	M1	eval_ours_stage2	256	-	0.7	-	1221.92	1137.66	3.2	success	KEEP	256 ep; 100% full-ep rate; BEATS pretrained by 9.3%

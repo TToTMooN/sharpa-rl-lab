@@ -66,3 +66,34 @@ Gravity curriculum caused expected dips mid-training. Checkpoints saved every 50
 | EXP-005 pretrained stage2 | 1040.63 | 99.1 | 113.4 | 1168.5 | 1052.64 | 100% |
 
 **Next**: EXP-006 — distill our stage-1 into a stage-2 ProprioAdapt policy for fair comparison with pretrained.
+
+---
+
+## EXP-006: ProprioAdapt Distillation (stage 2)
+**Hypothesis**: Distilling our EXP-003 stage-1 checkpoint via ProprioAdapt will produce a deployment-ready stage-2 policy comparable to the pretrained one.
+**Change**: Ran `train.py --algorithm ProprioAdapt --load_path logs/.../stage1_nn/last.pth --max_agent_steps 100000000` with 16384 envs.
+**Reward trajectory** (training-time mean over 20k-episode window):
+- 1M: 32, 3M: 150, 6M: 613, 8M: 764 (first plateau)
+- 12M: 826, 14M: 897, 20M: 958, 26M: 991 (bursts)
+- 32M: 970 (killed, plateau at 960-990)
+**Best training reward**: 992.39 at 26M steps
+**Distillation dynamics**: Non-linear — fast initial drop in embedding MSE loss causes quick reward bursts (0 → 150 → 600 → 900), then slow refinement. Training dynamics differ from stage-1 because only adapt_tconv is trained (rest of model frozen). Sa_mean_std is trained from scratch.
+**Decision**: KEEP — checkpoint at `logs/debug/2026-04-11_21-50-19/stage2_nn/best.pth`
+**Note**: Killed early at 32M/100M because plateau was clear; further training would give marginal gains.
+**Next**: EXP-007 — quantitative eval with randomization-off settings
+
+---
+
+## EXP-007: Evaluate Our Distilled Stage-2
+**Hypothesis**: Our stage-2 policy at least matches pretrained stage-2 (~1040 mean reward).
+**Outcome**: **Mean reward 1137.66** ± 79.2 over 256 episodes, **100% full-episode rate**, median 1142.6. **BEATS pretrained (1040.63) by 9.3%**. Even though training-time mean was 970, eval-time reward is higher due to disabled randomization.
+
+### Final M1 Comparison
+| Policy | Stage | Mean | Std | Median | Full-ep |
+|--------|-------|------|-----|--------|---------|
+| Our PPO stage-1 (EXP-004) | 1 | **1272.79** | 127.0 | 1288.75 | 99.6% |
+| Our ProprioAdapt stage-2 (EXP-007) | 2 | **1137.66** | 79.2 | 1142.61 | **100%** |
+| Pretrained stage-2 (EXP-005) | 2 | 1040.63 | 99.1 | 1052.64 | 100% |
+
+**M1 milestone REPRODUCED** — our end-to-end pipeline (PPO stage 1 → ProprioAdapt stage 2) matches and exceeds the shipped pretrained policy's performance on the `0.5-0.5-1` scale config.
+**Next**: EXP-008 — generate grasp cache for multi-scale config [0.4, 0.6, 8] to reproduce the harder pretrained.

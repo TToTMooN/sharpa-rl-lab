@@ -39,8 +39,8 @@ The task: **continuous Z-axis rotation of a cylinder** held by the 22-DOF Sharpa
 - [x] **EXP-004**: Evaluate our stage-1 PPO — mean reward 1272.79, 99.6% full-ep
 - [x] **EXP-005**: Evaluate pretrained stage-2 — mean reward 1040.63, 100% full-ep
   - Discovery: pretrained checkpoint is stage-2 ProprioAdapt, not PPO. Not directly comparable.
-- [ ] **EXP-006**: ProprioAdapt distillation on our EXP-003 stage-1 checkpoint
-- [ ] **EXP-007**: Evaluate our stage-2 vs pretrained stage-2 (fair comparison)
+- [x] **EXP-006**: ProprioAdapt distillation on our EXP-003 — best reward 992.39 at 32M steps (killed early)
+- [x] **EXP-007**: Evaluate our stage-2 — mean 1137.66, **beats pretrained (1040.63) by 9.3%**
 
 ### Phase 3: Train multi-scale variant
 - [ ] **EXP-008**: Generate grasp cache for scale_range=[0.4, 0.6, 8]
@@ -71,12 +71,20 @@ At ~52k FPS with 16384 envs on RTX 5090:
 - Grasp cache generation: ~19 min
 - ProprioAdapt distillation: TBD (typically faster than stage 1)
 
-## Observations so far
+## Observations — M1 (single-scale) complete
 
-- **EXP-003**: 300M steps in 91 min at 55k FPS. Best reward 1130.05, final mean 1088.09. Gravity curriculum dips visible in reward curve, recovers by end. 12.5 GB VRAM.
-- **EXP-004**: Our stage-1 PPO gets mean reward 1272.79 on 256-episode eval, 99.6% full-episode rate. Stronger than pretrained stage-2 (1040.63), but unfair comparison.
-- **EXP-005**: **Key finding** — the shipped `pretrained/0.5-0.5-1.pth` is a **stage-2 ProprioAdapt model**, not a stage-1 PPO policy. Has `adapt_tconv` layers. To reproduce fairly we must run full pipeline: PPO stage 1 → distill to stage 2 → eval stage 2.
-- **EXP-006** (in progress): Stage-2 distillation from our EXP-003 checkpoint, 100M agent steps.
+- **EXP-003**: 300M PPO steps in 91 min at 55k FPS. Best reward 1130.05, final mean 1088.09. Gravity curriculum dips visible in reward curve, recovers by end. 12.5 GB VRAM.
+- **EXP-004**: Our stage-1 PPO eval: mean 1272.79, 99.6% full-episode rate.
+- **EXP-005**: **Key finding** — shipped `pretrained/0.5-0.5-1.pth` is a stage-2 ProprioAdapt model (not stage-1 PPO). Has `adapt_tconv` layers.
+- **EXP-006**: Stage-2 distillation: converged to 970 training reward (best 992.39) in 32M steps (~22 min), plateau. Killed early.
+- **EXP-007**: Our stage-2 eval: mean **1137.66**, **beats pretrained (1040.63) by 9.3%**. 100% full-ep rate.
+
+### M1 single-scale success criteria — all met
+- ✓ Mean episode reward ≥ pretrained (1137 > 1040)
+- ✓ Object retention: 100% full-episode rate
+- ✓ ProprioAdapt distillation completes and produces deployable policy
+
+## Performance notes
 - CPU powersave mode active — perf governor change could help
 - IOMMU enabled — minor GPU overhead
 
