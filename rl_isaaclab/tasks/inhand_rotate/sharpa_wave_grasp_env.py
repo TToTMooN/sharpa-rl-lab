@@ -73,8 +73,9 @@ class SharpaWaveInhandRotateGraspEnv(SharpaWaveInhandRotateEnv):
             save_data = torch.zeros((0, self.pose_cache_dim), dtype=torch.float32, device=self.device)
             for saved_grasping_states in self.saved_grasping_states:
                 save_data = torch.cat([save_data, saved_grasping_states], dim=0)
-            # Use the same cache_path prefix that the training env will read from.
-            cache_prefix = getattr(self.cfg, 'grasp_cache_path', None) or 'cache/sharpa_grasp_linspace'
+            # Save location is controlled by cfg.grasp_cache_save_prefix (new field).
+            # Defaults to SharpaWave's legacy path.
+            cache_prefix = getattr(self.cfg, 'grasp_cache_save_prefix', None) or 'cache/sharpa_grasp_linspace'
             os.makedirs(os.path.dirname(cache_prefix) or 'cache', exist_ok=True)
             name = f'{cache_prefix}_{self.cfg.scale_range[0]}-{self.cfg.scale_range[1]}-{self.cfg.scale_range[2]}.npy'
             np.save(name, save_data.cpu().numpy())

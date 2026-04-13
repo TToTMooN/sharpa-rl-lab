@@ -156,8 +156,10 @@ class XhandGraspEnvCfg(SharpaWaveGraspEnvCfg):
         "right_hand_pinky_link2",
     ]
 
-    # Grasp cache save prefix (training env will look at cache/xhand_grasp_linspace_*.npy)
-    grasp_cache_path = "cache/xhand_grasp_linspace"
+    # Grasp cache save prefix (training env will look at cache/xhand_grasp_linspace_*.npy).
+    # NOTE: grasp_cache_path is None here (inherited) because the grasp env is CREATING
+    # the cache, not loading it. grasp_cache_save_prefix controls where it's written.
+    grasp_cache_save_prefix = "cache/xhand_grasp_linspace"
 
     # Start single-scale for M3 first pass
     scale_range = [0.5, 0.5, 1]
