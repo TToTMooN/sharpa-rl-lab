@@ -58,6 +58,10 @@ class SharpaWaveInhandRotateGraspEnv(SharpaWaveInhandRotateEnv):
             force_mean = force_norms.mean().item()
             force_max = force_norms.max().item()
             grav = self.physics_sim_view.get_gravity()
+            # Per-fingertip distances for env 0
+            ft_dist_e0 = fingertip_dist[0].tolist()
+            ft_pos_e0 = self.fingertip_pos[0].tolist()  # [num_fingertips, 3]
+            obj_pos_e0 = self.object_pos[0].tolist()
             print(
                 f"[GRASP DEBUG] step={self.common_step_counter} grav={grav} | "
                 f"cond1(dist<0.1)={n_pass1}/{self.num_envs} "
@@ -68,6 +72,9 @@ class SharpaWaveInhandRotateGraspEnv(SharpaWaveInhandRotateEnv):
                 f"force mean={force_mean:.4f} max={force_max:.4f}",
                 flush=True,
             )
+            print(f"[GRASP DEBUG env0] obj_pos={obj_pos_e0}", flush=True)
+            for i, (p, d) in enumerate(zip(ft_pos_e0, ft_dist_e0)):
+                print(f"[GRASP DEBUG env0]   ft{i} pos={p} dist={d:.4f}", flush=True)
 
         if self.common_step_counter % 40 == 0:
             self.physics_sim_view.set_gravity(self.gravity_all_directions[self.gravity_id])

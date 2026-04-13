@@ -211,12 +211,15 @@ class XhandEnvCfg(SharpaWaveEnvCfg):
             mass_props=sim_utils.MassPropertiesCfg(mass=0.05),
             scale=(1., 1., 1.),
         ),
-        init_state=RigidObjectCfg.InitialStateCfg(pos=(-0.04, 0.0, 0.585), rot=(1.0, 0.0, 0.0, 0.0)),
+        # Position derived from runtime fingertip diagnostic in EXP-022e:
+        # avg fingertip pos was (-0.085, 0.0, 0.634) — put cylinder slightly inside
+        # the fingertip arc so contact is actually made.
+        init_state=RigidObjectCfg.InitialStateCfg(pos=(-0.075, 0.0, 0.625), rot=(1.0, 0.0, 0.0, 0.0)),
     )
 
     # Override reset_height bounds for xhand cylinder pos
-    reset_height_lower = 0.565
-    reset_height_upper = 0.605
+    reset_height_lower = 0.605
+    reset_height_upper = 0.645
 
     # xhand has no separate elastomer/metal materials (elastomer_material_ids=[]),
     # so all hand materials get metal_base_friction. The SharpaWave default of 0.1

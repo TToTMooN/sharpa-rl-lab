@@ -189,11 +189,11 @@ class XhandGraspEnvCfg(SharpaWaveGraspEnvCfg):
             mass_props=sim_utils.MassPropertiesCfg(mass=0.05),
             scale=(1., 1., 1.),
         ),
-        init_state=RigidObjectCfg.InitialStateCfg(pos=(-0.04, 0.0, 0.585), rot=(1.0, 0.0, 0.0, 0.0)),
+        init_state=RigidObjectCfg.InitialStateCfg(pos=(-0.075, 0.0, 0.625), rot=(1.0, 0.0, 0.0, 0.0)),
     )
 
-    reset_height_lower = 0.565
-    reset_height_upper = 0.605
+    reset_height_lower = 0.605
+    reset_height_upper = 0.645
 
     # xhand has no separate elastomer/metal materials — bump friction so cylinder
     # doesn't slip out of grasp during the gravity-cycling search.
