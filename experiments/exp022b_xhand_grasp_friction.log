@@ -1,0 +1,90 @@
+[INFO][AppLauncher]: Using device: cuda:0
+[INFO][AppLauncher]: Loading experience file: /home/lingfeng/playground/sharpa-rl-lab/.pixi/envs/default/lib/python3.11/site-packages/isaaclab/apps/isaaclab.python.headless.kit
+[INFO]: Parsing configuration from: rl_isaaclab.tasks.inhand_rotate.xhand_grasp_env_cfg:XhandGraspEnvCfg
+[INFO]: Parsing configuration from: /home/lingfeng/playground/sharpa-rl-lab/rl_isaaclab/tasks/inhand_rotate/agents/ppo_cfg.yaml
+
+[36m======================================================================================[0m
+[36m[1m[INFO][IsaacLab]: Logging to file: /tmp/isaaclab/logs/isaaclab_2026-04-13_00-37-04.log[0m
+[36m======================================================================================[0m
+
+[33m00:37:04 [simulation_context.py] WARNING: The `enable_external_forces_every_iteration` parameter in the PhysxCfg is set to False. If you are experiencing noisy velocities, consider enabling this flag. You may need to slightly increase the number of velocity iterations (setting it to 1 or 2 rather than 0), together with this flag, to improve the accuracy of velocity updates.[0m
+[INFO]: Base environment:
+	Environment device    : cuda:0
+	Environment seed      : 42
+	Physics step-size     : 0.004166666666666667
+	Rendering step-size   : 0.008333333333333333
+	Environment step-size : 0.05
+[33m00:37:04 [direct_rl_env.py] WARNING: The render interval (2) is smaller than the decimation (12). Multiple render calls will happen for each environment step.If this is not intended, set the render interval to be equal to the decimation.[0m
+[33m00:37:04 [prims.py] WARNING: Could not perform 'modify_collision_properties' on any prims under: '/World/envs/env_0/Robot'. This might be because of the following reasons:
+	(1) The desired attribute does not exist on any of the prims.
+	(2) The desired attribute exists on an instanced prim.
+		Discovered list of instanced prim paths: ['/World/envs/env_0/Robot/right_hand_link/visuals', '/World/envs/env_0/Robot/right_hand_link/collisions', '/World/envs/env_0/Robot/right_hand_back_link/visuals', '/World/envs/env_0/Robot/right_hand_back_link/collisions', '/World/envs/env_0/Robot/right_hand_ee_link/visuals', '/World/envs/env_0/Robot/right_hand_ee_link/collisions', '/World/envs/env_0/Robot/right_hand_index_bend_link/visuals', '/World/envs/env_0/Robot/right_hand_index_bend_link/collisions', '/World/envs/env_0/Robot/right_hand_index_rota_link1/visuals', '/World/envs/env_0/Robot/right_hand_index_rota_link1/collisions', '/World/envs/env_0/Robot/right_hand_index_rota_link2/visuals', '/World/envs/env_0/Robot/right_hand_index_rota_link2/collisions', '/World/envs/env_0/Robot/right_hand_index_rota_tip/visuals', '/World/envs/env_0/Robot/right_hand_index_rota_tip/collisions', '/World/envs/env_0/Robot/right_hand_index_rotaback_link2/visuals', '/World/envs/env_0/Robot/right_hand_index_rotaback_link2/collisions', '/World/envs/env_0/Robot/right_hand_index_rotaback_link1/visuals', '/World/envs/env_0/Robot/right_hand_index_rotaback_link1/collisions', '/World/envs/env_0/Robot/right_hand_mid_link1/visuals', '/World/envs/env_0/Robot/right_hand_mid_link1/collisions', '/World/envs/env_0/Robot/right_hand_mid_link2/visuals', '/World/envs/env_0/Robot/right_hand_mid_link2/collisions', '/World/envs/env_0/Robot/right_hand_mid_tip/visuals', '/World/envs/env_0/Robot/right_hand_mid_tip/collisions', '/World/envs/env_0/Robot/right_hand_midback_link2/visuals', '/World/envs/env_0/Robot/right_hand_midback_link2/collisions', '/World/envs/env_0/Robot/right_hand_midback_link1/visuals', '/World/envs/env_0/Robot/right_hand_midback_link1/collisions', '/World/envs/env_0/Robot/right_hand_pinky_link1/visuals', '/World/envs/env_0/Robot/right_hand_pinky_link1/collisions', '/World/envs/env_0/Robot/right_hand_pinky_link2/visuals', '/World/envs/env_0/Robot/right_hand_pinky_link2/collisions', '/World/envs/env_0/Robot/right_hand_pinky_tip/visuals', '/World/envs/env_0/Robot/right_hand_pinky_tip/collisions', '/World/envs/env_0/Robot/right_hand_pinkyback_link2/visuals', '/World/envs/env_0/Robot/right_hand_pinkyback_link2/collisions', '/World/envs/env_0/Robot/right_hand_pinkyback_link1/visuals', '/World/envs/env_0/Robot/right_hand_pinkyback_link1/collisions', '/World/envs/env_0/Robot/right_hand_ring_link1/visuals', '/World/envs/env_0/Robot/right_hand_ring_link1/collisions', '/World/envs/env_0/Robot/right_hand_ring_link2/visuals', '/World/envs/env_0/Robot/right_hand_ring_link2/collisions', '/World/envs/env_0/Robot/right_hand_ring_tip/visuals', '/World/envs/env_0/Robot/right_hand_ring_tip/collisions', '/World/envs/env_0/Robot/right_hand_ringback_link2/visuals', '/World/envs/env_0/Robot/right_hand_ringback_link2/collisions', '/World/envs/env_0/Robot/right_hand_ringback_link1/visuals', '/World/envs/env_0/Robot/right_hand_ringback_link1/collisions', '/World/envs/env_0/Robot/right_hand_thumb_bend_link/visuals', '/World/envs/env_0/Robot/right_hand_thumb_bend_link/collisions', '/World/envs/env_0/Robot/right_hand_thumb_rota_link1/visuals', '/World/envs/env_0/Robot/right_hand_thumb_rota_link1/collisions', '/World/envs/env_0/Robot/right_hand_thumb_rota_link2/visuals', '/World/envs/env_0/Robot/right_hand_thumb_rota_link2/collisions', '/World/envs/env_0/Robot/right_hand_thumb_rota_tip/visuals', '/World/envs/env_0/Robot/right_hand_thumb_rota_tip/collisions', '/World/envs/env_0/Robot/right_hand_thumb_rotaback_link2/visuals', '/World/envs/env_0/Robot/right_hand_thumb_rotaback_link2/collisions', '/World/envs/env_0/Robot/right_hand_thumb_rotaback_link1/visuals', '/World/envs/env_0/Robot/right_hand_thumb_rotaback_link1/collisions'][0m
+[33m00:37:18 [interactive_scene.py] WARNING: Collision filtering can only be automatically enabled when replicate_physics=True and using GPU simulation. Please call scene.filter_collisions(global_prim_paths) to filter collisions across environments.[0m
+[INFO]: Time taken for scene creation : 13.703198 seconds
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 4096
+	Environment spacing   : 0.75
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : []
+	Replicate physics     : False
+[INFO]: Starting the simulation. This may take a few seconds. Please wait...
+[INFO]: Time taken for simulation start : 18.683495 seconds
+[INFO] Event Manager:  <EventManager> contains 1 active terms.
++----------------------------------------+
+| Active Event Terms in Mode: 'prestartup' |
++-----------+----------------------------+
+|   Index   | Name                       |
++-----------+----------------------------+
+|     0     | randomize_scale            |
++-----------+----------------------------+
+
+[INFO]: Completed setting up the environment...
+Error executing job with overrides: []
+Traceback (most recent call last):
+  File "/home/lingfeng/playground/sharpa-rl-lab/.pixi/envs/default/lib/python3.11/site-packages/isaaclab/source/isaaclab_tasks/isaaclab_tasks/utils/hydra.py", line 100, in hydra_main
+    func(env_cfg, agent_cfg, *args, **kwargs)
+  File "/home/lingfeng/playground/sharpa-rl-lab/rl_isaaclab/scripts/gen_grasp.py", line 60, in main
+    env = gym.make(args_cli.task, cfg=env_cfg, render_mode=None)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lingfeng/playground/sharpa-rl-lab/.pixi/envs/default/lib/python3.11/site-packages/gymnasium/envs/registration.py", line 734, in make
+    env = env_creator(**env_spec_kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lingfeng/playground/sharpa-rl-lab/rl_isaaclab/tasks/inhand_rotate/sharpa_wave_grasp_env.py", line 24, in __init__
+    super().__init__(cfg, render_mode, **kwargs)
+  File "/home/lingfeng/playground/sharpa-rl-lab/rl_isaaclab/tasks/inhand_rotate/sharpa_wave_env.py", line 156, in __init__
+    self.set_friction(self.hand, rand_friction_hand, self.num_envs)
+  File "/home/lingfeng/playground/sharpa-rl-lab/rl_isaaclab/tasks/inhand_rotate/sharpa_wave_env.py", line 475, in set_friction
+    materials[..., 0] = value  # Static friction.
+    ~~~~~~~~~^^^^^^^^
+RuntimeError: The expanded size of the tensor (390) must match the existing size (30) at non-singleton dimension 1.  Target sizes: [4096, 390].  Tensor sizes: [4096, 30]
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
+Loading user config located at: '/home/lingfeng/playground/sharpa-rl-lab/.pixi/envs/default/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/lingfeng/playground/sharpa-rl-lab/.pixi/envs/default/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260413_003701.log
+2026-04-13T04:37:01Z [58ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
+2026-04-13T04:37:02Z [218ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
+2026-04-13T04:37:02Z [310ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
+2026-04-13T04:37:02Z [315ms] [Warning] [omni.isaac.dynamic_control] omni.isaac.dynamic_control is deprecated as of Isaac Sim 4.5. No action is needed from end-users.
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 580.126.09    | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA GeForce RTX 5090          | Yes: 0 |     | 32607   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2b85      | 73366f21.. |
+|     |                                  |        |     |            | 1         |            |
+|=============================================================================================|
+| OS: 24.04.3 LTS (Noble Numbat) ubuntu, Version: 24.04.3, Kernel: 6.17.0-19-generic
+| Processor: AMD Ryzen 9 9900X 12-Core Processor
+| Cores: 12 | Logical Cores: 24
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 61829 | Free Memory: 56466
+| Total Page/Swap (MB): 8191 | Free Page/Swap: 8191
+|---------------------------------------------------------------------------------------------|
+2026-04-13T04:37:04Z [2,206ms] [Warning] [gpu.foundation.plugin] CPU performance profile is set to powersave. This profile sets the CPU to the lowest frequency reducing performance.
+2026-04-13T04:37:04Z [2,217ms] [Warning] [gpu.foundation.plugin] IOMMU is enabled.
+2026-04-13T04:37:37Z [35,916ms] [Warning] [omni.physx.plugin] USD stage detach not called, holding a loose ptr to a stage!
+2026-04-13T04:37:39Z [37,688ms] [Warning] [carb] Recursive unloadAllPlugins() detected!

@@ -147,8 +147,13 @@ class SharpaWaveInhandRotateEnv(DirectRLEnv):
             self.set_friction(self.object, rand_friction_object, self.num_envs)
             # Hand-specific material randomization.
             # SharpaWave has ~26 material slots with 5 elastomer slots at distinct indices.
-            # xhand has uniform materials (no elastomer distinction) — use single scale.
-            num_hand_materials = getattr(self.cfg, 'num_hand_materials', 26)
+            # xhand has more material slots and no elastomer distinction.
+            # Detect actual material count from physx view (more robust than cfg field).
+            actual_num_materials = self.hand.root_physx_view.get_material_properties().shape[1]
+            num_hand_materials_cfg = getattr(self.cfg, 'num_hand_materials', actual_num_materials)
+            num_hand_materials = actual_num_materials
+            if num_hand_materials_cfg != actual_num_materials:
+                carb.log_warn(f"cfg.num_hand_materials={num_hand_materials_cfg} but physx reports {actual_num_materials}; using actual.")
             material_elastomer_ids = getattr(self.cfg, 'elastomer_material_ids', [19, 20, 22, 24, 25])
             rand_friction_hand = rand_friction.clone().repeat(1, num_hand_materials) * self.cfg.metal_base_friction
             if material_elastomer_ids:
