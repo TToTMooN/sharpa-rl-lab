@@ -39,7 +39,7 @@ class SharpaWaveEnvCfg(DirectRLEnvCfg):
     action_space = 22
     observation_space = 192
     prop_hist_len = 30
-    priv_info_dim = 8
+    priv_info_dim = 9
     state_space = 0
     asymmetric_obs = False
     # control
@@ -193,6 +193,17 @@ class SharpaWaveEnvCfg(DirectRLEnvCfg):
             filter_prim_paths_expr=["/World/envs/env_.*/object"],
         )
     ]
+
+    # --- hand-specific overrideable fields (match training cfg) ---
+    contact_sensor_body_names: list[str] = [
+        "right_thumb_elastomer",
+        "right_index_elastomer",
+        "right_middle_elastomer",
+        "right_ring_elastomer",
+        "right_pinky_elastomer",
+    ]
+    num_hand_materials: int = 26
+    elastomer_material_ids: list[int] = [19, 20, 22, 24, 25]
 
     actuated_joint_names = [
         "right_thumb_CMC_FE",

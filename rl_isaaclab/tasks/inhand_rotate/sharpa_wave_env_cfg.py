@@ -197,6 +197,19 @@ class SharpaWaveEnvCfg(DirectRLEnvCfg):
         )
     ]
 
+    # --- hand-specific overrideable fields (HandSpec-ish) ---
+    # SharpaWave defaults below; xhand_env_cfg.py overrides these.
+    contact_sensor_body_names: list[str] = [
+        "right_thumb_elastomer",
+        "right_index_elastomer",
+        "right_middle_elastomer",
+        "right_ring_elastomer",
+        "right_pinky_elastomer",
+    ]
+    num_hand_materials: int = 26                      # Number of material slots on SharpaWave hand
+    elastomer_material_ids: list[int] = [19, 20, 22, 24, 25]  # Material indices that should use elastomer friction
+    # --- end hand-specific fields ---
+
     actuated_joint_names = [
         "right_thumb_CMC_FE",
         "right_thumb_CMC_AA",

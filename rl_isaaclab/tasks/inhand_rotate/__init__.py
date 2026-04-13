@@ -35,3 +35,26 @@ gym.register(
         "agent_cfg_entry_point": f"{agents.__name__}:ppo_cfg.yaml",
     },
 )
+
+# --- xhand (RoboEra) tasks ---
+# Reuses SharpaWaveInhandRotateEnv / SharpaWaveInhandRotateGraspEnv — the env logic is
+# hand-agnostic after the M3-EXP-016 refactor. Only the config changes.
+gym.register(
+    id="Isaac-Inhand-Rotate-Xhand-v0",
+    entry_point=f"rl_isaaclab.tasks.inhand_rotate.sharpa_wave_env:SharpaWaveInhandRotateEnv",
+    disable_env_checker=True,
+    kwargs={
+        "env_cfg_entry_point": f"{__name__}.xhand_env_cfg:XhandEnvCfg",
+        "agent_cfg_entry_point": f"{agents.__name__}:ppo_cfg.yaml",
+    },
+)
+
+gym.register(
+    id="Isaac-Inhand-Rotate-Grasp-Xhand-v0",
+    entry_point=f"rl_isaaclab.tasks.inhand_rotate.sharpa_wave_grasp_env:SharpaWaveInhandRotateGraspEnv",
+    disable_env_checker=True,
+    kwargs={
+        "env_cfg_entry_point": f"{__name__}.xhand_grasp_env_cfg:XhandGraspEnvCfg",
+        "agent_cfg_entry_point": f"{agents.__name__}:ppo_cfg.yaml",
+    },
+)

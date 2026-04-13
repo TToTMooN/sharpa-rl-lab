@@ -127,12 +127,17 @@ class SharpaWaveInhandRotateEnv(DirectRLEnv):
         self._contact_body_ids = torch.tensor([0, 1, 2, 3, 4], dtype=torch.long)
         self._contact_body_ids_disable = torch.tensor(self.cfg.disable_tactile_ids, dtype=torch.long)
         self.last_contacts = torch.zeros((self.num_envs, len(self._contact_body_ids)), dtype=torch.float, device=self.device)
-        self.elastomer_ids = [self.hand.body_names.index(body_name) for body_name in 
-                              ["right_thumb_elastomer", 
-                               "right_index_elastomer", 
-                               "right_middle_elastomer",
-                               "right_ring_elastomer", 
-                               "right_pinky_elastomer"]]
+        # Hand-specific: resolve contact-sensor body indices.
+        # - SharpaWave: elastomer bodies are distinct from fingertips (10 sensors total, we use 5 elastomers here)
+        # - xhand: no distinct elastomer bodies; cfg.contact_sensor_body_names points at fingertip *_tip links
+        _contact_body_names = getattr(self.cfg, 'contact_sensor_body_names', None) or [
+            "right_thumb_elastomer",
+            "right_index_elastomer",
+            "right_middle_elastomer",
+            "right_ring_elastomer",
+            "right_pinky_elastomer",
+        ]
+        self.elastomer_ids = [self.hand.body_names.index(n) for n in _contact_body_names]
 
         # randomize
         if self.cfg.randomize_friction:
@@ -140,10 +145,14 @@ class SharpaWaveInhandRotateEnv(DirectRLEnv):
             rand_friction = rand_friction.reshape(self.num_envs, 1)
             rand_friction_object = rand_friction.clone() * self.cfg.object_base_friction
             self.set_friction(self.object, rand_friction_object, self.num_envs)
-            # IMPORTANT, ELASTOMER MATERIAL IDS
-            material_elastomer_ids = [19, 20, 22, 24, 25]
-            rand_friction_hand = rand_friction.clone().repeat(1, 26) * self.cfg.metal_base_friction
-            rand_friction_hand[:, material_elastomer_ids] = rand_friction_hand[:, material_elastomer_ids] / self.cfg.metal_base_friction * self.cfg.elastomer_base_friction
+            # Hand-specific material randomization.
+            # SharpaWave has ~26 material slots with 5 elastomer slots at distinct indices.
+            # xhand has uniform materials (no elastomer distinction) — use single scale.
+            num_hand_materials = getattr(self.cfg, 'num_hand_materials', 26)
+            material_elastomer_ids = getattr(self.cfg, 'elastomer_material_ids', [19, 20, 22, 24, 25])
+            rand_friction_hand = rand_friction.clone().repeat(1, num_hand_materials) * self.cfg.metal_base_friction
+            if material_elastomer_ids:
+                rand_friction_hand[:, material_elastomer_ids] = rand_friction_hand[:, material_elastomer_ids] / self.cfg.metal_base_friction * self.cfg.elastomer_base_friction
             self.set_friction(self.hand, rand_friction_hand, self.num_envs)
             self.priv_info_buf[:, 3] = rand_friction.squeeze()
         if self.cfg.randomize_com:
