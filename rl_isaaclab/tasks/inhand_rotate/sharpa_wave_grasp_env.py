@@ -22,7 +22,9 @@ from .sharpa_wave_env import SharpaWaveInhandRotateEnv
 class SharpaWaveInhandRotateGraspEnv(SharpaWaveInhandRotateEnv):
     def __init__(self, cfg: SharpaWaveEnvCfg, render_mode: str | None = None, **kwargs):
         super().__init__(cfg, render_mode, **kwargs)
-        self.saved_grasping_states = [torch.zeros((0, 29), dtype=torch.float32, device=self.device) for _ in range(self.cfg.scale_range[2])]
+        # Grasp cache row layout: [D hand DOFs | 3 object_pos | 4 object_quat], total D+7 columns.
+        self.pose_cache_dim = self.num_hand_dofs + 7
+        self.saved_grasping_states = [torch.zeros((0, self.pose_cache_dim), dtype=torch.float32, device=self.device) for _ in range(self.cfg.scale_range[2])]
         self.gravity_id = 0
         self.gravity_all_directions = [
             carb.Float3(0.0, 0.0, 9.81),
@@ -35,7 +37,8 @@ class SharpaWaveInhandRotateGraspEnv(SharpaWaveInhandRotateEnv):
 
     def _get_rewards(self) -> torch.Tensor:
         cond1 = (torch.norm(self.fingertip_pos - self.object_pos.unsqueeze(1), dim=-1, p=2) < 0.1).all(-1)
-        filtered_force_matrix = torch.cat([self._contact_sensor[id].data.force_matrix_w[:, 0, 0, :].unsqueeze(1) for id in range(10)], dim=1)
+        num_sensors = len(self._contact_sensor)
+        filtered_force_matrix = torch.cat([self._contact_sensor[id].data.force_matrix_w[:, 0, 0, :].unsqueeze(1) for id in range(num_sensors)], dim=1)
         cond2 = (torch.norm(filtered_force_matrix, dim=-1, p=2) > 0.5).sum(-1) >= 3
         cond3 = torch.less(quat_to_rot(quat_mul(self.object_rot, quat_conjugate(self.object.data.default_root_state.clone()[:, 3:7]))), self.cfg.reset_angle_diff)
         cond = cond1.float() * cond2.float() * cond3.float()
@@ -56,21 +59,24 @@ class SharpaWaveInhandRotateGraspEnv(SharpaWaveInhandRotateEnv):
         saved_scale_ids = self.scale_ids[success]
         sum_total = 0
         finish_scale = 0
+        target_per_scale = 5e4 // self.cfg.scale_range[2]
         for id, saved_scale_id in enumerate(saved_scale_ids):
-            if self.saved_grasping_states[saved_scale_id].shape[0] < 5e4//self.cfg.scale_range[2]:
-                self.saved_grasping_states[saved_scale_id] = torch.cat([self.saved_grasping_states[saved_scale_id], all_states[id].reshape(-1, 29)], dim=0)
+            if self.saved_grasping_states[saved_scale_id].shape[0] < target_per_scale:
+                self.saved_grasping_states[saved_scale_id] = torch.cat([self.saved_grasping_states[saved_scale_id], all_states[id].reshape(-1, self.pose_cache_dim)], dim=0)
         for id, saved_grasping_states in enumerate(self.saved_grasping_states):
-            if saved_grasping_states.shape[0] >= 5e4//self.cfg.scale_range[2]:
+            if saved_grasping_states.shape[0] >= target_per_scale:
                 finish_scale += 1
             sum_total += saved_grasping_states.shape[0]
         print(f'[{time.strftime("%Y-%m-%d %H:%M:%S")}] current cache size: {sum_total}, finished: {finish_scale}')
         if finish_scale == self.cfg.scale_range[2]:
             print('done!')
-            save_data = torch.zeros((0, 29), dtype=torch.float32, device=self.device)
+            save_data = torch.zeros((0, self.pose_cache_dim), dtype=torch.float32, device=self.device)
             for saved_grasping_states in self.saved_grasping_states:
                 save_data = torch.cat([save_data, saved_grasping_states], dim=0)
-            os.makedirs('cache', exist_ok=True)
-            name = f'cache/sharpa_grasp_linspace_{self.cfg.scale_range[0]}-{self.cfg.scale_range[1]}-{self.cfg.scale_range[2]}.npy'
+            # Use the same cache_path prefix that the training env will read from.
+            cache_prefix = getattr(self.cfg, 'grasp_cache_path', None) or 'cache/sharpa_grasp_linspace'
+            os.makedirs(os.path.dirname(cache_prefix) or 'cache', exist_ok=True)
+            name = f'{cache_prefix}_{self.cfg.scale_range[0]}-{self.cfg.scale_range[1]}-{self.cfg.scale_range[2]}.npy'
             np.save(name, save_data.cpu().numpy())
             exit()
 

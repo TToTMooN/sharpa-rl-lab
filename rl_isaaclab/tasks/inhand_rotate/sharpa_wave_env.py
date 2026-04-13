@@ -303,16 +303,19 @@ class SharpaWaveInhandRotateEnv(DirectRLEnv):
             rand_scale = self._rand_pd_scales(self.cfg.randomize_d_gain_scale_lower, self.cfg.randomize_d_gain_scale_upper, len(env_ids), self.num_hand_dofs)
             self.d_gain[env_ids] = self.d_gain_default[env_ids] * rand_scale
 
-        # pose cache
+        # pose cache: layout is [D hand DOFs | 3 object_pos | 4 object_quat], total D+7 columns.
+        pose_cache_dim = self.num_hand_dofs + 7
+        obj_pos_slice = slice(self.num_hand_dofs, self.num_hand_dofs + 3)
+        obj_quat_slice = slice(self.num_hand_dofs + 3, self.num_hand_dofs + 7)
         if self.saved_grasping_states is not None:
             sampled_pose_idx = torch.randint(0, self.bucket_grasp, size=(self.bucket_env,))
-            saved_grasping_states_picked = torch.zeros((self.num_envs, 29), device=self.device)
+            saved_grasping_states_picked = torch.zeros((self.num_envs, pose_cache_dim), device=self.device)
             for i in range(self.cfg.scale_range[2]):
                 saved_grasping_states_picked[i*self.bucket_env:(i+1)*self.bucket_env] = self.saved_grasping_states[i*self.bucket_grasp:(i+1)*self.bucket_grasp][sampled_pose_idx]
             sampled_pose = saved_grasping_states_picked[env_ids].clone()
         else:
             raise RuntimeError("No saved grasping states found")
-        
+
         if self.cfg.reset_random_quat:
             rotate_center = self.hand.data.default_root_state.clone()[env_ids, :3]
             q_rand = get_random_rotation(env_ids, self.device)
@@ -325,12 +328,12 @@ class SharpaWaveInhandRotateEnv(DirectRLEnv):
         if self.cfg.reset_random_quat:
             _, object_default_pos = apply_random_rotation_with_center(object_default_state[:, 3:7], object_default_state[:, 0:3], rotate_center, q_rand)
             self.object_default_pose[env_ids, :3] = object_default_pos.clone()
-            object_default_state[:, 3:7], object_default_state[:, 0:3] = apply_random_rotation_with_center(sampled_pose[:, 25:29], sampled_pose[:, 22:25], rotate_center, q_rand)
+            object_default_state[:, 3:7], object_default_state[:, 0:3] = apply_random_rotation_with_center(sampled_pose[:, obj_quat_slice], sampled_pose[:, obj_pos_slice], rotate_center, q_rand)
             object_default_state[:, 0:3] += self.scene.env_origins[env_ids]
         else:
             self.object_default_pose[env_ids, :3] = object_default_state[:, :3].clone()
-            object_default_state[:, 0:3] = sampled_pose[:, 22:25] + self.scene.env_origins[env_ids]
-            object_default_state[:, 3:7] = sampled_pose[:, 25:29]
+            object_default_state[:, 0:3] = sampled_pose[:, obj_pos_slice] + self.scene.env_origins[env_ids]
+            object_default_state[:, 3:7] = sampled_pose[:, obj_quat_slice]
         object_default_state[:, 7:] = torch.zeros_like(self.object.data.default_root_state[env_ids, 7:])
         self.object.write_root_pose_to_sim(object_default_state[:, :7], env_ids)
         self.object.write_root_velocity_to_sim(object_default_state[:, 7:], env_ids)
@@ -346,7 +349,7 @@ class SharpaWaveInhandRotateEnv(DirectRLEnv):
             hand_default_state[:, 3:7], hand_default_state[:, 0:3] = apply_random_rotation_with_center(hand_default_state[:, 3:7], hand_default_state[:, :3], rotate_center, q_rand)
         hand_default_state[:, 0:3] += self.scene.env_origins[env_ids]
         self.hand.write_root_state_to_sim(hand_default_state, env_ids)
-        dof_pos = sampled_pose[:, :22]
+        dof_pos = sampled_pose[:, :self.num_hand_dofs]
         dof_vel = torch.zeros_like(self.hand.data.default_joint_vel[env_ids])
         self.prev_targets[env_ids] = dof_pos
         self.cur_targets[env_ids] = dof_pos
@@ -447,14 +450,18 @@ class SharpaWaveInhandRotateEnv(DirectRLEnv):
 
         # refill the initialized buffers
         at_reset_env_ids = self.at_reset_buf.nonzero(as_tuple=False).squeeze(-1)
-        self.obs_buf_lag_history[at_reset_env_ids, :, 0:22] = unscale(
-            self.hand_dof_pos[at_reset_env_ids], 
+        # Per-frame obs layout: [joint_pos (D), joint_targets (D), contacts (5), contact_pos (15)]
+        # where D = num_hand_dofs (22 for SharpaWave, 12 for xhand).
+        D = self.num_hand_dofs
+        n_contact = len(self._contact_body_ids)  # typically 5 fingertips
+        self.obs_buf_lag_history[at_reset_env_ids, :, 0:D] = unscale(
+            self.hand_dof_pos[at_reset_env_ids],
             self.hand_dof_lower_limits[at_reset_env_ids],
             self.hand_dof_upper_limits[at_reset_env_ids],
         ).clone().unsqueeze(1)
-        self.obs_buf_lag_history[at_reset_env_ids, :, 22:44] = self.hand_dof_pos[at_reset_env_ids].unsqueeze(1)
-        self.obs_buf_lag_history[at_reset_env_ids, :, 44:49] = sensed_contacts[at_reset_env_ids].unsqueeze(1)
-        self.obs_buf_lag_history[at_reset_env_ids, :, 49:64] = contact_pos[at_reset_env_ids].unsqueeze(1)
+        self.obs_buf_lag_history[at_reset_env_ids, :, D:2*D] = self.hand_dof_pos[at_reset_env_ids].unsqueeze(1)
+        self.obs_buf_lag_history[at_reset_env_ids, :, 2*D:2*D + n_contact] = sensed_contacts[at_reset_env_ids].unsqueeze(1)
+        self.obs_buf_lag_history[at_reset_env_ids, :, 2*D + n_contact:2*D + n_contact + 3*n_contact] = contact_pos[at_reset_env_ids].unsqueeze(1)
         self.at_reset_buf[at_reset_env_ids] = 0
         obs_buf = (self.obs_buf_lag_history[:, -3:].reshape(self.num_envs, -1)).clone()
 
