@@ -120,35 +120,35 @@ class XhandEnvCfg(SharpaWaveEnvCfg):
     # --- contact sensors (5 fingertips, no elastomer/DP split) ---
     contact_sensor = [
         ContactSensorCfg(
-            prim_path="/World/envs/env_.*/Robot/right_hand_thumb_rota_tip",
+            prim_path="/World/envs/env_.*/Robot/right_hand_thumb_rota_link2",
             history_length=3,
             track_contact_points=True,
             max_contact_data_count_per_prim=10,
             filter_prim_paths_expr=["/World/envs/env_.*/object"],
         ),
         ContactSensorCfg(
-            prim_path="/World/envs/env_.*/Robot/right_hand_index_rota_tip",
+            prim_path="/World/envs/env_.*/Robot/right_hand_index_rota_link2",
             history_length=3,
             track_contact_points=True,
             max_contact_data_count_per_prim=10,
             filter_prim_paths_expr=["/World/envs/env_.*/object"],
         ),
         ContactSensorCfg(
-            prim_path="/World/envs/env_.*/Robot/right_hand_mid_tip",
+            prim_path="/World/envs/env_.*/Robot/right_hand_mid_link2",
             history_length=3,
             track_contact_points=True,
             max_contact_data_count_per_prim=10,
             filter_prim_paths_expr=["/World/envs/env_.*/object"],
         ),
         ContactSensorCfg(
-            prim_path="/World/envs/env_.*/Robot/right_hand_ring_tip",
+            prim_path="/World/envs/env_.*/Robot/right_hand_ring_link2",
             history_length=3,
             track_contact_points=True,
             max_contact_data_count_per_prim=10,
             filter_prim_paths_expr=["/World/envs/env_.*/object"],
         ),
         ContactSensorCfg(
-            prim_path="/World/envs/env_.*/Robot/right_hand_pinky_tip",
+            prim_path="/World/envs/env_.*/Robot/right_hand_pinky_link2",
             history_length=3,
             track_contact_points=True,
             max_contact_data_count_per_prim=10,
