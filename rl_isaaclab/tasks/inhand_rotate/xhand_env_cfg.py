@@ -89,22 +89,25 @@ class XhandEnvCfg(SharpaWaveEnvCfg):
         init_state=ArticulationCfg.InitialStateCfg(
             pos=hand_init_pose[0],
             rot=hand_init_pose[1],
-            # Half-flexed "cupped" pose ready to grasp a cylinder.
-            # Thumb: opposed, slightly flexed.
-            # Fingers: MCP (joint1) ~55°, PIP (joint2) ~55°, index bend neutral.
+            # Cupped fingertip cage pose verified TRAINABLE by Gemini 3.1 Pro
+            # in iter3 (xhand_20260413_000438_report.md).
+            # - thumb_bend=1.5: across-palm opposition
+            # - thumb_rota1=0.4, thumb_rota2=0.7: thumb flexed toward fingers
+            # - finger flex=0.85: C-shape cage around cylinder
+            # - index_bend=0.0: neutral abduction
             joint_pos={
-                "right_hand_thumb_bend_joint": 1.0,     # approach toward palm
-                "right_hand_thumb_rota_joint1": 0.5,
-                "right_hand_thumb_rota_joint2": 0.8,
-                "right_hand_index_bend_joint": 0.0,     # neutral abduction
-                "right_hand_index_joint1": 0.96,
-                "right_hand_index_joint2": 0.96,
-                "right_hand_mid_joint1": 0.96,
-                "right_hand_mid_joint2": 0.96,
-                "right_hand_ring_joint1": 0.96,
-                "right_hand_ring_joint2": 0.96,
-                "right_hand_pinky_joint1": 0.96,
-                "right_hand_pinky_joint2": 0.96,
+                "right_hand_thumb_bend_joint": 1.5,
+                "right_hand_thumb_rota_joint1": 0.4,
+                "right_hand_thumb_rota_joint2": 0.7,
+                "right_hand_index_bend_joint": 0.0,
+                "right_hand_index_joint1": 0.85,
+                "right_hand_index_joint2": 0.85,
+                "right_hand_mid_joint1": 0.85,
+                "right_hand_mid_joint2": 0.85,
+                "right_hand_ring_joint1": 0.85,
+                "right_hand_ring_joint2": 0.85,
+                "right_hand_pinky_joint1": 0.85,
+                "right_hand_pinky_joint2": 0.85,
             },
         ),
         actuators={
@@ -180,6 +183,40 @@ class XhandEnvCfg(SharpaWaveEnvCfg):
         "right_hand_ring_tip",
         "right_hand_pinky_tip",
     ]
+
+    # --- override cylinder spawn (palm location is different from SharpaWave) ---
+    # Verified TRAINABLE in iter3 visual_check.
+    object_cfg: RigidObjectCfg = RigidObjectCfg(
+        prim_path="/World/envs/env_.*/object",
+        spawn=sim_utils.UsdFileCfg(
+            usd_path=os.path.join(
+                os.path.dirname(os.path.abspath(__file__)),
+                "../../../assets/cylinder/cylinder.usd",
+            ),
+            rigid_props=sim_utils.RigidBodyPropertiesCfg(
+                kinematic_enabled=False,
+                disable_gravity=False,
+                enable_gyroscopic_forces=True,
+                solver_position_iteration_count=8,
+                solver_velocity_iteration_count=0,
+                sleep_threshold=0.005,
+                stabilization_threshold=0.0025,
+                max_depenetration_velocity=1000.0,
+            ),
+            collision_props=sim_utils.CollisionPropertiesCfg(
+                collision_enabled=True,
+                contact_offset=0.002,
+                rest_offset=0.0,
+            ),
+            mass_props=sim_utils.MassPropertiesCfg(mass=0.05),
+            scale=(1., 1., 1.),
+        ),
+        init_state=RigidObjectCfg.InitialStateCfg(pos=(-0.04, 0.0, 0.585), rot=(1.0, 0.0, 0.0, 0.0)),
+    )
+
+    # Override reset_height bounds for xhand cylinder pos
+    reset_height_lower = 0.565
+    reset_height_upper = 0.605
 
     # --- override grasp cache path for xhand ---
     grasp_cache_path = "cache/xhand_grasp_linspace"

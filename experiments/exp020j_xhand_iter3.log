@@ -1,0 +1,64 @@
+Loading user config located at: '/home/lingfeng/playground/sharpa-rl-lab/.pixi/envs/default/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/lingfeng/playground/sharpa-rl-lab/.pixi/envs/default/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260413_000432.log
+2026-04-13T04:04:32Z [82ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.
+2026-04-13T04:04:32Z [82ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)
+2026-04-13T04:04:32Z [89ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 580.126.09    | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA GeForce RTX 5090          | Yes: 0 |     | 32607   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2b85      | 73366f21.. |
+|     |                                  |        |     |            | 1         |            |
+|=============================================================================================|
+| OS: 24.04.3 LTS (Noble Numbat) ubuntu, Version: 24.04.3, Kernel: 6.17.0-19-generic
+| Processor: AMD Ryzen 9 9900X 12-Core Processor
+| Cores: 12 | Logical Cores: 24
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 61829 | Free Memory: 56910
+| Total Page/Swap (MB): 8191 | Free Page/Swap: 8191
+|---------------------------------------------------------------------------------------------|
+2026-04-13T04:04:32Z [549ms] [Warning] [gpu.foundation.plugin] CPU performance profile is set to powersave. This profile sets the CPU to the lowest frequency reducing performance.
+2026-04-13T04:04:32Z [560ms] [Warning] [gpu.foundation.plugin] IOMMU is enabled.
+2026-04-13T04:04:33Z [900ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.
+2026-04-13T04:04:33Z [900ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)
+2026-04-13T04:04:33Z [910ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.
+2026-04-13T04:04:33Z [910ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)
+2026-04-13T04:04:33Z [914ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.
+2026-04-13T04:04:33Z [914ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)
+2026-04-13T04:04:33Z [918ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.
+2026-04-13T04:04:33Z [918ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)
+2026-04-13T04:04:33Z [918ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.
+2026-04-13T04:04:33Z [918ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)
+/home/lingfeng/playground/sharpa-rl-lab/rl_isaaclab/scripts/visual_check.py:74: DeprecationWarning: The module actuator_cfg.py is deprecated. Please import IdealPDActuatorCfg directly from the isaaclab.actuators package, or from its new module isaaclab.actuators.actuator_pd_cfg.
+  from isaaclab.actuators.actuator_cfg import IdealPDActuatorCfg
+[INFO][AppLauncher]: Using device: cuda:0
+[INFO][AppLauncher]: Loading experience file: /home/lingfeng/playground/sharpa-rl-lab/.pixi/envs/default/lib/python3.11/site-packages/isaaclab/apps/isaaclab.python.headless.rendering.kit
+
+[36m======================================================================================[0m
+[36m[1m[INFO][IsaacLab]: Logging to file: /tmp/isaaclab/logs/isaaclab_2026-04-13_00-04-36.log[0m
+[36m======================================================================================[0m
+
+[33m00:04:36 [simulation_context.py] WARNING: The `enable_external_forces_every_iteration` parameter in the PhysxCfg is set to False. If you are experiencing noisy velocities, consider enabling this flag. You may need to slightly increase the number of velocity iterations (setting it to 1 or 2 rather than 0), together with this flag, to improve the accuracy of velocity updates.[0m
+[VIZ] Robot: xhand
+[VIZ] USD:   /home/lingfeng/playground/sharpa-rl-lab/assets/xhand/xhand_right.usd
+[VIZ] Hand pose: pos=(0.0, 0.0, 0.5), rot=(0.819152, 0.0, -0.5735764, 0.0)
+[VIZ] Cyl pos: (-0.04, 0.0, 0.585)
+[VIZ DEBUG] Articulation joint_names (order is what the cache row uses):
+  [ 0] right_hand_index_bend_joint: pos=+0.0000 default=+0.0000 limits=[-0.1740, +0.1740]
+  [ 1] right_hand_mid_joint1: pos=+0.8500 default=+0.8500 limits=[+0.0000, +1.9190]
+  [ 2] right_hand_pinky_joint1: pos=+0.8500 default=+0.8500 limits=[+0.0000, +1.9190]
+  [ 3] right_hand_ring_joint1: pos=+0.8500 default=+0.8500 limits=[+0.0000, +1.9190]
+  [ 4] right_hand_thumb_bend_joint: pos=+1.5000 default=+1.5000 limits=[+0.0000, +1.8320]
+  [ 5] right_hand_index_joint1: pos=+0.8500 default=+0.8500 limits=[+0.0000, +1.9190]
+  [ 6] right_hand_mid_joint2: pos=+0.8500 default=+0.8500 limits=[+0.0000, +1.9190]
+  [ 7] right_hand_pinky_joint2: pos=+0.8500 default=+0.8500 limits=[+0.0000, +1.9190]
+  [ 8] right_hand_ring_joint2: pos=+0.8500 default=+0.8500 limits=[+0.0000, +1.9190]
+  [ 9] right_hand_thumb_rota_joint1: pos=+0.4000 default=+0.4000 limits=[-0.6980, +1.5700]
+  [10] right_hand_index_joint2: pos=+0.8500 default=+0.8500 limits=[+0.0000, +1.9190]
+  [11] right_hand_thumb_rota_joint2: pos=+0.7000 default=+0.7000 limits=[+0.0000, +1.5700]
+[VIZ DEBUG] total joints=12

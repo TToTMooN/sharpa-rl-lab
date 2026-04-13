@@ -7,7 +7,7 @@ import math
 import os
 
 import isaaclab.sim as sim_utils
-from isaaclab.assets import ArticulationCfg
+from isaaclab.assets import ArticulationCfg, RigidObjectCfg
 from isaaclab.actuators.actuator_cfg import IdealPDActuatorCfg
 from isaaclab.sensors import ContactSensorCfg
 from isaaclab.utils import configclass
@@ -70,19 +70,21 @@ class XhandGraspEnvCfg(SharpaWaveGraspEnvCfg):
         init_state=ArticulationCfg.InitialStateCfg(
             pos=hand_init_pose[0],
             rot=hand_init_pose[1],
+            # Cupped fingertip cage pose (verified TRAINABLE by Gemini 3.1 Pro,
+            # iter3 in xhand_20260413_000438_report.md).
             joint_pos={
-                "right_hand_thumb_bend_joint": 1.0,
-                "right_hand_thumb_rota_joint1": 0.5,
-                "right_hand_thumb_rota_joint2": 0.8,
+                "right_hand_thumb_bend_joint": 1.5,
+                "right_hand_thumb_rota_joint1": 0.4,
+                "right_hand_thumb_rota_joint2": 0.7,
                 "right_hand_index_bend_joint": 0.0,
-                "right_hand_index_joint1": 0.96,
-                "right_hand_index_joint2": 0.96,
-                "right_hand_mid_joint1": 0.96,
-                "right_hand_mid_joint2": 0.96,
-                "right_hand_ring_joint1": 0.96,
-                "right_hand_ring_joint2": 0.96,
-                "right_hand_pinky_joint1": 0.96,
-                "right_hand_pinky_joint2": 0.96,
+                "right_hand_index_joint1": 0.85,
+                "right_hand_index_joint2": 0.85,
+                "right_hand_mid_joint1": 0.85,
+                "right_hand_mid_joint2": 0.85,
+                "right_hand_ring_joint1": 0.85,
+                "right_hand_ring_joint2": 0.85,
+                "right_hand_pinky_joint1": 0.85,
+                "right_hand_pinky_joint2": 0.85,
             },
         ),
         actuators={
@@ -160,6 +162,38 @@ class XhandGraspEnvCfg(SharpaWaveGraspEnvCfg):
     # NOTE: grasp_cache_path is None here (inherited) because the grasp env is CREATING
     # the cache, not loading it. grasp_cache_save_prefix controls where it's written.
     grasp_cache_save_prefix = "cache/xhand_grasp_linspace"
+
+    # Override cylinder spawn position to match the verified TRAINABLE pose.
+    object_cfg: RigidObjectCfg = RigidObjectCfg(
+        prim_path="/World/envs/env_.*/object",
+        spawn=sim_utils.UsdFileCfg(
+            usd_path=os.path.join(
+                os.path.dirname(os.path.abspath(__file__)),
+                "../../../assets/cylinder/cylinder.usd",
+            ),
+            rigid_props=sim_utils.RigidBodyPropertiesCfg(
+                kinematic_enabled=False,
+                disable_gravity=False,
+                enable_gyroscopic_forces=True,
+                solver_position_iteration_count=8,
+                solver_velocity_iteration_count=0,
+                sleep_threshold=0.005,
+                stabilization_threshold=0.0025,
+                max_depenetration_velocity=1000.0,
+            ),
+            collision_props=sim_utils.CollisionPropertiesCfg(
+                collision_enabled=True,
+                contact_offset=0.002,
+                rest_offset=0.0,
+            ),
+            mass_props=sim_utils.MassPropertiesCfg(mass=0.05),
+            scale=(1., 1., 1.),
+        ),
+        init_state=RigidObjectCfg.InitialStateCfg(pos=(-0.04, 0.0, 0.585), rot=(1.0, 0.0, 0.0, 0.0)),
+    )
+
+    reset_height_lower = 0.565
+    reset_height_upper = 0.605
 
     # Start single-scale for M3 first pass
     scale_range = [0.5, 0.5, 1]
