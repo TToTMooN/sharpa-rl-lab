@@ -1,0 +1,145 @@
+[INFO][AppLauncher]: Using device: cuda:0
+[INFO][AppLauncher]: Loading experience file: /home/lingfeng/playground/sharpa-rl-lab/.pixi/envs/default/lib/python3.11/site-packages/isaaclab/apps/isaaclab.python.headless.kit
+[INFO]: Parsing configuration from: rl_isaaclab.tasks.inhand_rotate.xhand_grasp_env_cfg:XhandGraspEnvCfg
+[INFO]: Parsing configuration from: /home/lingfeng/playground/sharpa-rl-lab/rl_isaaclab/tasks/inhand_rotate/agents/ppo_cfg.yaml
+
+[36m======================================================================================[0m
+[36m[1m[INFO][IsaacLab]: Logging to file: /tmp/isaaclab/logs/isaaclab_2026-04-12_22-14-56.log[0m
+[36m======================================================================================[0m
+
+[33m22:14:56 [simulation_context.py] WARNING: The `enable_external_forces_every_iteration` parameter in the PhysxCfg is set to False. If you are experiencing noisy velocities, consider enabling this flag. You may need to slightly increase the number of velocity iterations (setting it to 1 or 2 rather than 0), together with this flag, to improve the accuracy of velocity updates.[0m
+[INFO]: Base environment:
+	Environment device    : cuda:0
+	Environment seed      : 42
+	Physics step-size     : 0.004166666666666667
+	Rendering step-size   : 0.008333333333333333
+	Environment step-size : 0.05
+[33m22:14:56 [direct_rl_env.py] WARNING: The render interval (2) is smaller than the decimation (12). Multiple render calls will happen for each environment step.If this is not intended, set the render interval to be equal to the decimation.[0m
+[33m22:14:57 [prims.py] WARNING: Could not perform 'modify_collision_properties' on any prims under: '/World/envs/env_0/Robot'. This might be because of the following reasons:
+	(1) The desired attribute does not exist on any of the prims.
+	(2) The desired attribute exists on an instanced prim.
+		Discovered list of instanced prim paths: ['/World/envs/env_0/Robot/right_hand_link/visuals', '/World/envs/env_0/Robot/right_hand_link/collisions', '/World/envs/env_0/Robot/right_hand_index_bend_link/visuals', '/World/envs/env_0/Robot/right_hand_index_bend_link/collisions', '/World/envs/env_0/Robot/right_hand_index_rota_link1/visuals', '/World/envs/env_0/Robot/right_hand_index_rota_link1/collisions', '/World/envs/env_0/Robot/right_hand_index_rota_link2/visuals', '/World/envs/env_0/Robot/right_hand_index_rota_link2/collisions', '/World/envs/env_0/Robot/right_hand_mid_link1/visuals', '/World/envs/env_0/Robot/right_hand_mid_link1/collisions', '/World/envs/env_0/Robot/right_hand_mid_link2/visuals', '/World/envs/env_0/Robot/right_hand_mid_link2/collisions', '/World/envs/env_0/Robot/right_hand_pinky_link1/visuals', '/World/envs/env_0/Robot/right_hand_pinky_link1/collisions', '/World/envs/env_0/Robot/right_hand_pinky_link2/visuals', '/World/envs/env_0/Robot/right_hand_pinky_link2/collisions', '/World/envs/env_0/Robot/right_hand_ring_link1/visuals', '/World/envs/env_0/Robot/right_hand_ring_link1/collisions', '/World/envs/env_0/Robot/right_hand_ring_link2/visuals', '/World/envs/env_0/Robot/right_hand_ring_link2/collisions', '/World/envs/env_0/Robot/right_hand_thumb_bend_link/visuals', '/World/envs/env_0/Robot/right_hand_thumb_bend_link/collisions', '/World/envs/env_0/Robot/right_hand_thumb_rota_link1/visuals', '/World/envs/env_0/Robot/right_hand_thumb_rota_link1/collisions', '/World/envs/env_0/Robot/right_hand_thumb_rota_link2/visuals', '/World/envs/env_0/Robot/right_hand_thumb_rota_link2/collisions'][0m
+[33m22:15:37 [interactive_scene.py] WARNING: Collision filtering can only be automatically enabled when replicate_physics=True and using GPU simulation. Please call scene.filter_collisions(global_prim_paths) to filter collisions across environments.[0m
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [96,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [97,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [98,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [99,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [100,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [101,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [102,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [103,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [104,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [105,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [106,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [107,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [108,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [109,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [110,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [111,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [112,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [113,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [114,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [115,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [116,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [117,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [118,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [119,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [120,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [121,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [122,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [123,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [124,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [125,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [126,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+/pytorch/aten/src/ATen/native/cuda/Indexing.cu:1553: indexSelectLargeIndex: block: [16,0,0], thread: [127,0,0] Assertion `srcIndex < srcSelectDimSize` failed.
+Loading user config located at: '/home/lingfeng/playground/sharpa-rl-lab/.pixi/envs/default/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/lingfeng/playground/sharpa-rl-lab/.pixi/envs/default/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260412_221453.log
+2026-04-13T02:14:53Z [56ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
+2026-04-13T02:14:53Z [216ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
+2026-04-13T02:14:53Z [305ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
+2026-04-13T02:14:53Z [309ms] [Warning] [omni.isaac.dynamic_control] omni.isaac.dynamic_control is deprecated as of Isaac Sim 4.5. No action is needed from end-users.
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 580.126.09    | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA GeForce RTX 5090          | Yes: 0 |     | 32607   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2b85      | 73366f21.. |
+|     |                                  |        |     |            | 1         |            |
+|=============================================================================================|
+| OS: 24.04.3 LTS (Noble Numbat) ubuntu, Version: 24.04.3, Kernel: 6.17.0-19-generic
+| Processor: AMD Ryzen 9 9900X 12-Core Processor
+| Cores: 12 | Logical Cores: 24
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 61829 | Free Memory: 56447
+| Total Page/Swap (MB): 8191 | Free Page/Swap: 8191
+|---------------------------------------------------------------------------------------------|
+2026-04-13T02:14:55Z [2,227ms] [Warning] [gpu.foundation.plugin] CPU performance profile is set to powersave. This profile sets the CPU to the lowest frequency reducing performance.
+2026-04-13T02:14:55Z [2,238ms] [Warning] [gpu.foundation.plugin] IOMMU is enabled.
+2026-04-13T02:16:33Z [100,061ms] [Warning] [omni.physx.fabric.plugin] FabricManager::initializePointInstancer mismatched prototypes on point instancer: /Visuals/CylinderAxes.
+2026-04-13T02:16:34Z [100,912ms] [Warning] [omni.physx.tensors.plugin] Incomplete contact data is reported in GpuRigidContactView::getContactData because there are more contact data points than specified maxContactDataCount = 163840.
+[INFO]: Time taken for scene creation : 41.755019 seconds
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 16384
+	Environment spacing   : 0.75
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : []
+	Replicate physics     : False
+[INFO]: Starting the simulation. This may take a few seconds. Please wait...
+[INFO]: Time taken for simulation start : 54.670080 seconds
+[INFO] Event Manager:  <EventManager> contains 1 active terms.
++----------------------------------------+
+| Active Event Terms in Mode: 'prestartup' |
++-----------+----------------------------+
+|   Index   | Name                       |
++-----------+----------------------------+
+|     0     | randomize_scale            |
++-----------+----------------------------+
+
+[INFO]: Completed setting up the environment...
+[2026-04-12 22:16:33] current cache size: 0, finished: 0
+[2026-04-12 22:16:33] current cache size: 0, finished: 0
+Error executing job with overrides: []
+Traceback (most recent call last):
+  File "/home/lingfeng/playground/sharpa-rl-lab/.pixi/envs/default/lib/python3.11/site-packages/isaaclab/source/isaaclab_tasks/isaaclab_tasks/utils/hydra.py", line 100, in hydra_main
+    func(env_cfg, agent_cfg, *args, **kwargs)
+  File "/home/lingfeng/playground/sharpa-rl-lab/rl_isaaclab/scripts/gen_grasp.py", line 66, in main
+    _ = env.step(actions)
+        ^^^^^^^^^^^^^^^^^
+  File "/home/lingfeng/playground/sharpa-rl-lab/rl_isaaclab/wrapper/sharpa_wave_env_wrapper.py", line 161, in step
+    obs_dict, rew, terminated, truncated, extras = self.env.step(actions)
+                                                   ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lingfeng/playground/sharpa-rl-lab/.pixi/envs/default/lib/python3.11/site-packages/gymnasium/wrappers/common.py", line 393, in step
+    return super().step(action)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/lingfeng/playground/sharpa-rl-lab/.pixi/envs/default/lib/python3.11/site-packages/gymnasium/core.py", line 327, in step
+    return self.env.step(action)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lingfeng/playground/sharpa-rl-lab/.pixi/envs/default/lib/python3.11/site-packages/isaaclab/source/isaaclab/isaaclab/envs/direct_rl_env.py", line 384, in step
+    self.scene.update(dt=self.physics_dt)
+  File "/home/lingfeng/playground/sharpa-rl-lab/.pixi/envs/default/lib/python3.11/site-packages/isaaclab/source/isaaclab/isaaclab/scene/interactive_scene.py", line 498, in update
+    sensor.update(dt, force_recompute=not self.cfg.lazy_sensor_update)
+  File "/home/lingfeng/playground/sharpa-rl-lab/.pixi/envs/default/lib/python3.11/site-packages/isaaclab/source/isaaclab/isaaclab/sensors/sensor_base.py", line 192, in update
+    self._update_outdated_buffers()
+  File "/home/lingfeng/playground/sharpa-rl-lab/.pixi/envs/default/lib/python3.11/site-packages/isaaclab/source/isaaclab/isaaclab/sensors/sensor_base.py", line 363, in _update_outdated_buffers
+    self._is_outdated[outdated_env_ids] = False
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+RuntimeError: CUDA error: device-side assert triggered
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
+2026-04-13T02:16:34Z [101,319ms] [Error] [omni.physx.fabric.plugin] CUDA error: device-side assert triggered: ../../../extensions/runtime/source/omni.physx.fabric/plugins/DirectGpuHelper.cpp: 563
+2026-04-13T02:16:34Z [101,319ms] [Error] [omni.physx.fabric.plugin] CUDA error: device-side assert triggered: ../../../extensions/runtime/source/omni.physx.fabric/plugins/DirectGpuHelper.cpp: 566
+2026-04-13T02:16:34Z [101,319ms] [Error] [omni.physx.fabric.plugin] CUDA error: device-side assert triggered: ../../../extensions/runtime/source/omni.physx.fabric/plugins/DirectGpuHelper.cpp: 569
+2026-04-13T02:16:34Z [101,319ms] [Error] [omni.physx.fabric.plugin] CUDA error: device-side assert triggered: ../../../extensions/runtime/source/omni.physx.fabric/plugins/DirectGpuHelper.cpp: 572
+2026-04-13T02:16:34Z [101,319ms] [Error] [omni.physx.fabric.plugin] CUDA error: device-side assert triggered: ../../../extensions/runtime/source/omni.physx.fabric/plugins/DirectGpuHelper.cpp: 575
+2026-04-13T02:16:34Z [101,319ms] [Error] [omni.physx.fabric.plugin] CUDA error: device-side assert triggered: ../../../extensions/runtime/source/omni.physx.fabric/plugins/DirectGpuHelper.cpp: 578
+2026-04-13T02:16:34Z [101,319ms] [Error] [omni.physx.fabric.plugin] CUDA error: device-side assert triggered: ../../../extensions/runtime/source/omni.physx.fabric/plugins/DirectGpuHelper.cpp: 581
+2026-04-13T02:16:34Z [101,319ms] [Error] [omni.physx.fabric.plugin] CUDA error: device-side assert triggered: ../../../extensions/runtime/source/omni.physx.fabric/plugins/DirectGpuHelper.cpp: 584
+2026-04-13T02:16:34Z [101,319ms] [Error] [omni.physx.fabric.plugin] CUDA error: device-side assert triggered: ../../../extensions/runtime/source/omni.physx.fabric/plugins/DirectGpuHelper.cpp: 587

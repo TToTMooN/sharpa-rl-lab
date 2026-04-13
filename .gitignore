@@ -15,3 +15,12 @@ pixi.lock
 # Omniverse / Isaac
 outputs/
 .thumbs/
+
+# Secrets — never commit API keys
+.key/
+*.key.json
+!.key/.gitkeep
+
+# Diagnostics screenshots
+experiments/screenshots/*.png
+experiments/screenshots/*.jpg

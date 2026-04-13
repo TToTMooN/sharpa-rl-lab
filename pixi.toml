@@ -13,7 +13,8 @@ pip = "*"
 # Environment setup
 install-deps = """pip install isaaclab[isaacsim,all]==2.3.2.post1 --extra-index-url https://pypi.nvidia.com && \
 pip install torch==2.7.0+cu128 torchvision==0.22.0+cu128 torchaudio==2.7.0+cu128 --index-url https://download.pytorch.org/whl/cu128 && \
-pip install tensorboardX omegaconf termcolor && \
+pip install tensorboardX omegaconf termcolor google-genai pillow && \
+pip install 'typing_extensions==4.14.0' 'websockets==13.0' && \
 pip install -e ."""
 
 # Step 1: Generate grasp cache
@@ -45,3 +46,6 @@ eval = "python rl_isaaclab/scripts/eval.py --task Isaac-Inhand-Rotate-Sharpa-Wav
 
 # Summarize experiments.tsv
 analyze = "python experiments/analyze.py"
+
+# VLM visual sanity check (captures a screenshot and asks Gemini to analyze)
+visual-check = "python rl_isaaclab/scripts/visual_check.py"
