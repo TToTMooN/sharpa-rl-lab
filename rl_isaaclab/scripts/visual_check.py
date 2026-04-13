@@ -350,8 +350,8 @@ def main():
 
     # Gemini analysis
     if args_cli.gemini:
-        from rl_isaaclab.diagnostics.vlm import check_initial_pose, MODEL_ROBOTICS
-        model = args_cli.gemini_model or MODEL_ROBOTICS
+        from rl_isaaclab.diagnostics.vlm import check_initial_pose, MODEL_PRO
+        model = args_cli.gemini_model or MODEL_PRO
         print(f"[VIZ] Gemini analyzing with {model}...")
         if args_cli.prompt:
             from rl_isaaclab.diagnostics.vlm import analyze_image

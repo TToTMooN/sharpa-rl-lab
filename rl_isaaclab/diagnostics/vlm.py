@@ -166,7 +166,7 @@ Be specific. If you can estimate distances, do so in millimeters.
 def check_initial_pose(
     image_path: str | Path,
     robot_name: str = "SharpaWave",
-    model: str = MODEL_ROBOTICS,
+    model: str = MODEL_PRO,
 ) -> str:
     """Check whether an initial hand+object pose is a viable starting state
     for in-hand rotation RL training.
@@ -262,7 +262,7 @@ def visual_check(
     image_path: str | Path,
     task_name: str = "inhand_rotate",
     robot_name: str = "SharpaWave",
-    model: str = MODEL_ROBOTICS,
+    model: str = MODEL_PRO,
 ) -> str:
     """High-level visual plausibility check on a simulation screenshot."""
     prompt = f"Task: {task_name}\nRobot: {robot_name}\n\n" + _LEGACY_ENV_CHECK_PROMPT
