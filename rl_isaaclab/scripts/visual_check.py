@@ -39,6 +39,10 @@ parser.add_argument("--cyl_pos", type=float, nargs=3, default=None,
                     help="Override cylinder initial position.")
 parser.add_argument("--thumb_bend", type=float, default=None,
                     help="xhand: override right_hand_thumb_bend_joint initial value.")
+parser.add_argument("--thumb_rota1", type=float, default=None,
+                    help="xhand: override right_hand_thumb_rota_joint1 initial value.")
+parser.add_argument("--thumb_rota2", type=float, default=None,
+                    help="xhand: override right_hand_thumb_rota_joint2 initial value.")
 parser.add_argument("--finger_flex", type=float, default=None,
                     help="xhand: override all finger joint1/joint2 initial values (default 0.96).")
 parser.add_argument("--gravity", action="store_true",
@@ -135,6 +139,10 @@ def _apply_overrides():
         CYL_INIT_POS = tuple(args_cli.cyl_pos)
     if args_cli.thumb_bend is not None:
         XHAND_INIT_JOINTS["right_hand_thumb_bend_joint"] = args_cli.thumb_bend
+    if args_cli.thumb_rota1 is not None:
+        XHAND_INIT_JOINTS["right_hand_thumb_rota_joint1"] = args_cli.thumb_rota1
+    if args_cli.thumb_rota2 is not None:
+        XHAND_INIT_JOINTS["right_hand_thumb_rota_joint2"] = args_cli.thumb_rota2
     if args_cli.finger_flex is not None:
         v = args_cli.finger_flex
         for f in ("index", "mid", "ring", "pinky"):
