@@ -45,6 +45,12 @@ parser.add_argument("--thumb_rota2", type=float, default=None,
                     help="xhand: override right_hand_thumb_rota_joint2 initial value.")
 parser.add_argument("--finger_flex", type=float, default=None,
                     help="xhand: override all finger joint1/joint2 initial values (default 0.96).")
+parser.add_argument("--finger_j1", type=float, default=None,
+                    help="xhand: override finger joint1 (base/MCP flex) only.")
+parser.add_argument("--finger_j2", type=float, default=None,
+                    help="xhand: override finger joint2 (tip/DIP flex) only.")
+parser.add_argument("--cyl_rot", type=float, nargs=4, default=None,
+                    help="Override cylinder initial quaternion (w,x,y,z). Default upright.")
 parser.add_argument("--gravity", action="store_true",
                     help="Enable gravity (default off for pose inspection).")
 parser.add_argument("--cache", type=str, default=None,
@@ -126,17 +132,20 @@ XHAND_INIT_JOINTS = {
 HAND_INIT_POS = (0.0, 0.0, 0.5)
 HAND_INIT_ROT = (0.819152, 0.0, -0.5735764, 0.0)
 CYL_INIT_POS = (-0.09559, -0.00517, 0.61906)
+CYL_INIT_ROT = (1.0, 0.0, 0.0, 0.0)
 
 
 def _apply_overrides():
     """Apply CLI overrides to the module-level pose constants and joint dicts."""
-    global HAND_INIT_POS, HAND_INIT_ROT, CYL_INIT_POS
+    global HAND_INIT_POS, HAND_INIT_ROT, CYL_INIT_POS, CYL_INIT_ROT
     if args_cli.hand_pos is not None:
         HAND_INIT_POS = tuple(args_cli.hand_pos)
     if args_cli.hand_rot is not None:
         HAND_INIT_ROT = tuple(args_cli.hand_rot)
     if args_cli.cyl_pos is not None:
         CYL_INIT_POS = tuple(args_cli.cyl_pos)
+    if args_cli.cyl_rot is not None:
+        CYL_INIT_ROT = tuple(args_cli.cyl_rot)
     if args_cli.thumb_bend is not None:
         XHAND_INIT_JOINTS["right_hand_thumb_bend_joint"] = args_cli.thumb_bend
     if args_cli.thumb_rota1 is not None:
@@ -148,6 +157,12 @@ def _apply_overrides():
         for f in ("index", "mid", "ring", "pinky"):
             XHAND_INIT_JOINTS[f"right_hand_{f}_joint1"] = v
             XHAND_INIT_JOINTS[f"right_hand_{f}_joint2"] = v
+    if args_cli.finger_j1 is not None:
+        for f in ("index", "mid", "ring", "pinky"):
+            XHAND_INIT_JOINTS[f"right_hand_{f}_joint1"] = args_cli.finger_j1
+    if args_cli.finger_j2 is not None:
+        for f in ("index", "mid", "ring", "pinky"):
+            XHAND_INIT_JOINTS[f"right_hand_{f}_joint2"] = args_cli.finger_j2
 
 
 def _load_cache_row(cache_path: str, joint_names: list[str]) -> tuple[dict, tuple]:
@@ -255,7 +270,7 @@ def main():
             mass_props=sim_utils.MassPropertiesCfg(mass=0.05),
             scale=(args_cli.obj_scale,) * 3,
         ),
-        init_state=RigidObjectCfg.InitialStateCfg(pos=CYL_INIT_POS, rot=(1.0, 0.0, 0.0, 0.0)),
+        init_state=RigidObjectCfg.InitialStateCfg(pos=CYL_INIT_POS, rot=CYL_INIT_ROT),
     )
     obj = RigidObject(obj_cfg)
 

@@ -70,28 +70,34 @@ class XhandGraspEnvCfg(SharpaWaveGraspEnvCfg):
         init_state=ArticulationCfg.InitialStateCfg(
             pos=hand_init_pose[0],
             rot=hand_init_pose[1],
-            # Cupped fingertip cage pose (verified TRAINABLE by Gemini 3.1 Pro,
-            # iter3 in xhand_20260413_000438_report.md).
+            # 4-finger wrap pose. VLM iter3 confirmed all 4 main fingers wrap
+            # the cylinder (xhand_20260413_014733_report.md). Base joints (j1)
+            # mostly extended, tip joints (j2) curled to wrap. Thumb opposes
+            # via heavy bend across palm.
             joint_pos={
-                "right_hand_thumb_bend_joint": 1.5,
-                "right_hand_thumb_rota_joint1": 0.4,
-                "right_hand_thumb_rota_joint2": 0.7,
+                "right_hand_thumb_bend_joint": 1.8,
+                "right_hand_thumb_rota_joint1": 1.5,
+                "right_hand_thumb_rota_joint2": 1.0,
                 "right_hand_index_bend_joint": 0.0,
-                "right_hand_index_joint1": 0.85,
-                "right_hand_index_joint2": 0.85,
-                "right_hand_mid_joint1": 0.85,
-                "right_hand_mid_joint2": 0.85,
-                "right_hand_ring_joint1": 0.85,
-                "right_hand_ring_joint2": 0.85,
-                "right_hand_pinky_joint1": 0.85,
-                "right_hand_pinky_joint2": 0.85,
+                "right_hand_index_joint1": 0.95,
+                "right_hand_index_joint2": 1.1,
+                "right_hand_mid_joint1": 0.95,
+                "right_hand_mid_joint2": 1.1,
+                "right_hand_ring_joint1": 0.95,
+                "right_hand_ring_joint2": 1.1,
+                "right_hand_pinky_joint1": 0.95,
+                "right_hand_pinky_joint2": 1.1,
             },
         ),
         actuators={
             "joints": IdealPDActuatorCfg(
                 joint_names_expr=[".*"],
-                stiffness=None,
-                damping=None,
+                # Explicit PD gains — URDF-converted USD leaves drive stiffness
+                # at 0, so joints couldn't resist cylinder contact forces and
+                # the hand deformed on every run. 20 Nm/rad is enough to hold
+                # the pose while the cylinder presses in.
+                stiffness=20.0,
+                damping=1.0,
             ),
         },
         soft_joint_pos_limit_factor=1.0,
@@ -189,11 +195,15 @@ class XhandGraspEnvCfg(SharpaWaveGraspEnvCfg):
             mass_props=sim_utils.MassPropertiesCfg(mass=0.05),
             scale=(1., 1., 1.),
         ),
-        init_state=RigidObjectCfg.InitialStateCfg(pos=(-0.075, 0.0, 0.625), rot=(1.0, 0.0, 0.0, 0.0)),
+        # Vertical cylinder. With the wrap pose (j1 0.95, j2 1.1), the 4 main
+        # fingers (index/mid/ring/pinky) form a partial cage that wraps the upper
+        # side of the cylinder. Cylinder lowered (z=0.585) so it sits deeper in
+        # the cup, fingers wrap from above.
+        init_state=RigidObjectCfg.InitialStateCfg(pos=(-0.06, 0.0, 0.585), rot=(1.0, 0.0, 0.0, 0.0)),
     )
 
-    reset_height_lower = 0.605
-    reset_height_upper = 0.645
+    reset_height_lower = 0.565
+    reset_height_upper = 0.605
 
     # xhand has no separate elastomer/metal materials — bump friction so cylinder
     # doesn't slip out of grasp during the gravity-cycling search.
@@ -209,7 +219,9 @@ class XhandGraspEnvCfg(SharpaWaveGraspEnvCfg):
     randomize_friction_scale_lower = 1.0
     randomize_friction_scale_upper = 1.0
 
-    # Start single-scale for M3 first pass
-    scale_range = [0.5, 0.5, 1]
+    # xhand cage thumb-to-fingers gap is ~69mm (measured runtime EXP-022f);
+    # at scale 0.5 cylinder diameter is 40mm so fingertips never touch.
+    # Use scale 1.0 (radius=40mm, length=64mm) so cylinder fills the cage.
+    scale_range = [1.0, 1.0, 1]
     events: EventCfg = EventCfg()
     events.rand_params(scale_range)

@@ -16,3 +16,12 @@ id	date	milestone	description	num_envs	max_steps	duration_min	fps	best_reward	me
 012	2026-04-12	M2	full_ppo_priv9_multiscale	16384	300000000	94	51866	996.09	979.17	12.5	success	KEEP	scale-aware priv_info (dim 9); +17% best +21% mean vs EXP-009; logs/debug/2026-04-12_16-12-33
 013	2026-04-12	M2	distill_priv9_multiscale	16384	100000000	31	54632	810.51	768.92	12.5	success	KEEP	--max_agent_steps now works; loss 0.33→0.04; converges to ~800 vs EXP-010 stuck at 190
 014	2026-04-12	M2	eval_priv9_stage2_multiscale	256	-	0.7	-	1197.04	1031.46	3.2	success	KEEP	96.5% full-ep; BEATS pretrained (950.38) by +8.5%; CLOSES the M1 multi-scale gap
+015	2026-04-12	M3	xhand_urdf_unpack	-	-	5	-	-	-	-	success	KEEP	URDF v1.3 unpacked; 12 DOF, 13 joints verified
+016	2026-04-12	M3	handspec_refactor	-	-	30	-	-	-	-	success	KEEP	contact_sensor_body_names, num_hand_materials, elastomer_material_ids fields added
+017	2026-04-12	M3	xhand_urdf_to_usd	-	-	10	-	-	-	-	success	KEEP	merge_fixed_joints=False to preserve tip links as rigid bodies
+018	2026-04-12	M3	vlm_diagnostic_pipeline	-	-	20	-	-	-	-	success	KEEP	Gemini Pro visual check harness; calibrated vs SharpaWave ground truth
+019	2026-04-12	M3	xhand_pose_iter1_4	-	-	60	-	-	-	-	success	KEEP	VLM-guided init pose iterations; 4 rounds; best: iter3 4-finger wrap
+022	2026-04-13	M3	xhand_grasp_gen_fail	256	-	45	-	-	-	-	fail	REVERT	cond2 (contact forces) always 0; cylinder escapes xhand's flat-cup cage
+022h	2026-04-13	M3	xhand_grasp_gen_iter3pose	256	-	5	-	-	-	-	fail	REVERT	iter3 wrap pose in real physics: thumb tucks under palm, 4 fingers drift
+022i	2026-04-13	M3	xhand_pd_gains_20	256	-	3	-	-	-	-	fail	REVERT	explicit stiffness=20 didn't help — root cause is cage geometry not PD
+022j	2026-04-13	M3	xhand_synth_cache	-	-	1	-	-	-	-	success	KEEP	50k perturbed-pose synthetic cache generated; bypasses broken grasp gen
