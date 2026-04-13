@@ -38,7 +38,18 @@ Each milestone gets its own file. Experiments in `experiments/experiments.tsv` r
 
 | ID | Title | Status | Experiments |
 |----|-------|--------|-------------|
-| M1 | [Reproduce SHARPA RL results](M1_reproduce_sharpa.md) | in_progress | EXP-000..003+ |
-| M2 | [Close distillation gap + ablate components](M2_ablation.md) | planned | — |
-| M3 | [Generalize — new tasks + new hands (xhand, Allegro)](M3_extend.md) | planned | — |
-| M4 | [Sim2real & deployment](M4_sim2real.md) | planned | — |
+| M1 | [Reproduce SHARPA RL results](M1_reproduce_sharpa.md) | ✅ done | EXP-000..011c |
+| M2A | [Close distillation gap](M2_ablation.md) (Phase A) | ✅ done | EXP-012..014 |
+| **M3** | [Generalize to RoboEra xhand](M3_extend.md) | **in progress** | EXP-015+ |
+| M2B/C/D | [Component ablations + reward decomp + profiling](M2_ablation.md) | **deferred (between M3 and M4)** | — |
+| M4 | [Sim2real & deployment on xhand](M4_sim2real.md) | planned | — |
+
+## Execution order
+
+1. ✅ M1 — Reproduce SHARPA on SharpaWave (both single-scale and multi-scale)
+2. ✅ M2 Phase A — Close the distillation gap (found root cause: scale missing from priv_info)
+3. **→ M3 — Port recipe to RoboEra xhand** (URDF + 12 DOF, grasp cache, retrain, distill, eval)
+4. M2 Phase B/C/D — Component ablations + reward decomposition + profiling, now on BOTH SharpaWave and xhand → better informed conclusions
+5. M4 — Sim2real deployment on real xhand, using insights from steps 3+4
+
+**Why this order?** M2 B/C/D is about *understanding* the recipe so we can tune it on new hardware. It's most useful right before M4, and doing it after M3 means we can run each ablation on two hands instead of one — stronger claims about which components generalize.
