@@ -36,13 +36,39 @@ class SharpaWaveInhandRotateGraspEnv(SharpaWaveInhandRotateEnv):
         ]
 
     def _get_rewards(self) -> torch.Tensor:
-        cond1 = (torch.norm(self.fingertip_pos - self.object_pos.unsqueeze(1), dim=-1, p=2) < 0.1).all(-1)
+        # Per-fingertip distance to object center
+        fingertip_dist = torch.norm(self.fingertip_pos - self.object_pos.unsqueeze(1), dim=-1, p=2)  # [N, num_fingertips]
+        cond1 = (fingertip_dist < 0.1).all(-1)
         num_sensors = len(self._contact_sensor)
         filtered_force_matrix = torch.cat([self._contact_sensor[id].data.force_matrix_w[:, 0, 0, :].unsqueeze(1) for id in range(num_sensors)], dim=1)
-        cond2 = (torch.norm(filtered_force_matrix, dim=-1, p=2) > 0.5).sum(-1) >= 3
+        force_norms = torch.norm(filtered_force_matrix, dim=-1, p=2)  # [N, num_sensors]
+        cond2 = (force_norms > 0.5).sum(-1) >= 3
         cond3 = torch.less(quat_to_rot(quat_mul(self.object_rot, quat_conjugate(self.object.data.default_root_state.clone()[:, 3:7]))), self.cfg.reset_angle_diff)
         cond = cond1.float() * cond2.float() * cond3.float()
         self.reset_buf[cond < 1] = 1
+
+        # Diagnostic print every 200 steps for env 0
+        if self.common_step_counter % 200 == 0 and self.num_envs > 0:
+            n_pass1 = cond1.sum().item()
+            n_pass2 = cond2.sum().item()
+            n_pass3 = cond3.sum().item()
+            n_pass_all = (cond > 0).sum().item()
+            ft_dist_mean = fingertip_dist.mean().item()
+            ft_dist_max = fingertip_dist.max().item()
+            force_mean = force_norms.mean().item()
+            force_max = force_norms.max().item()
+            grav = self.physics_sim_view.get_gravity()
+            print(
+                f"[GRASP DEBUG] step={self.common_step_counter} grav={grav} | "
+                f"cond1(dist<0.1)={n_pass1}/{self.num_envs} "
+                f"cond2(>=3 forces>0.5)={n_pass2}/{self.num_envs} "
+                f"cond3(quat<thresh)={n_pass3}/{self.num_envs} "
+                f"all={n_pass_all}/{self.num_envs} | "
+                f"ft_dist mean={ft_dist_mean:.4f} max={ft_dist_max:.4f} | "
+                f"force mean={force_mean:.4f} max={force_max:.4f}",
+                flush=True,
+            )
+
         if self.common_step_counter % 40 == 0:
             self.physics_sim_view.set_gravity(self.gravity_all_directions[self.gravity_id])
             self.gravity_id += 1
