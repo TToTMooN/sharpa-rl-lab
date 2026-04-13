@@ -41,11 +41,11 @@ class XhandEnvCfg(SharpaWaveEnvCfg):
     # --- hand-specific contact/material ---
     # xhand has no distinct elastomer bodies; use fingertip *_tip links as contact sensors.
     contact_sensor_body_names: list[str] = [
-        "right_hand_thumb_rota_tip",
-        "right_hand_index_rota_tip",
-        "right_hand_mid_tip",
-        "right_hand_ring_tip",
-        "right_hand_pinky_tip",
+        "right_hand_thumb_rota_link2",
+        "right_hand_index_rota_link2",
+        "right_hand_mid_link2",
+        "right_hand_ring_link2",
+        "right_hand_pinky_link2",
     ]
     # Uniform friction across xhand materials — no elastomer distinction needed.
     # Setting elastomer_material_ids to empty skips the elastomer friction scaling.
@@ -174,11 +174,11 @@ class XhandEnvCfg(SharpaWaveEnvCfg):
 
     # --- fingertip body names (same as contact sensors for xhand) ---
     fingertip_body_names = [
-        "right_hand_thumb_rota_tip",
-        "right_hand_index_rota_tip",
-        "right_hand_mid_tip",
-        "right_hand_ring_tip",
-        "right_hand_pinky_tip",
+        "right_hand_thumb_rota_link2",
+        "right_hand_index_rota_link2",
+        "right_hand_mid_link2",
+        "right_hand_ring_link2",
+        "right_hand_pinky_link2",
     ]
 
     # --- override grasp cache path for xhand ---

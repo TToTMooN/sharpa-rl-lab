@@ -26,11 +26,11 @@ class XhandGraspEnvCfg(SharpaWaveGraspEnvCfg):
 
     # --- hand-specific contact/material ---
     contact_sensor_body_names: list[str] = [
-        "right_hand_thumb_rota_tip",
-        "right_hand_index_rota_tip",
-        "right_hand_mid_tip",
-        "right_hand_ring_tip",
-        "right_hand_pinky_tip",
+        "right_hand_thumb_rota_link2",
+        "right_hand_index_rota_link2",
+        "right_hand_mid_link2",
+        "right_hand_ring_link2",
+        "right_hand_pinky_link2",
     ]
     num_hand_materials: int = 30
     elastomer_material_ids: list[int] = []
@@ -149,11 +149,11 @@ class XhandGraspEnvCfg(SharpaWaveGraspEnvCfg):
     ]
 
     fingertip_body_names = [
-        "right_hand_thumb_rota_tip",
-        "right_hand_index_rota_tip",
-        "right_hand_mid_tip",
-        "right_hand_ring_tip",
-        "right_hand_pinky_tip",
+        "right_hand_thumb_rota_link2",
+        "right_hand_index_rota_link2",
+        "right_hand_mid_link2",
+        "right_hand_ring_link2",
+        "right_hand_pinky_link2",
     ]
 
     # Start single-scale for M3 first pass
