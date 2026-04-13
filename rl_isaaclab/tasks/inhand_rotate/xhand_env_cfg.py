@@ -41,11 +41,11 @@ class XhandEnvCfg(SharpaWaveEnvCfg):
     # --- hand-specific contact/material ---
     # xhand has no distinct elastomer bodies; use fingertip *_tip links as contact sensors.
     contact_sensor_body_names: list[str] = [
-        "right_hand_thumb_rota_link2",
-        "right_hand_index_rota_link2",
-        "right_hand_mid_link2",
-        "right_hand_ring_link2",
-        "right_hand_pinky_link2",
+        "right_hand_thumb_rota_tip",
+        "right_hand_index_rota_tip",
+        "right_hand_mid_tip",
+        "right_hand_ring_tip",
+        "right_hand_pinky_tip",
     ]
     # Uniform friction across xhand materials — no elastomer distinction needed.
     # Setting elastomer_material_ids to empty skips the elastomer friction scaling.
@@ -120,35 +120,35 @@ class XhandEnvCfg(SharpaWaveEnvCfg):
     # --- contact sensors (5 fingertips, no elastomer/DP split) ---
     contact_sensor = [
         ContactSensorCfg(
-            prim_path="/World/envs/env_.*/Robot/right_hand_thumb_rota_link2",
+            prim_path="/World/envs/env_.*/Robot/right_hand_thumb_rota_tip",
             history_length=3,
             track_contact_points=True,
             max_contact_data_count_per_prim=10,
             filter_prim_paths_expr=["/World/envs/env_.*/object"],
         ),
         ContactSensorCfg(
-            prim_path="/World/envs/env_.*/Robot/right_hand_index_rota_link2",
+            prim_path="/World/envs/env_.*/Robot/right_hand_index_rota_tip",
             history_length=3,
             track_contact_points=True,
             max_contact_data_count_per_prim=10,
             filter_prim_paths_expr=["/World/envs/env_.*/object"],
         ),
         ContactSensorCfg(
-            prim_path="/World/envs/env_.*/Robot/right_hand_mid_link2",
+            prim_path="/World/envs/env_.*/Robot/right_hand_mid_tip",
             history_length=3,
             track_contact_points=True,
             max_contact_data_count_per_prim=10,
             filter_prim_paths_expr=["/World/envs/env_.*/object"],
         ),
         ContactSensorCfg(
-            prim_path="/World/envs/env_.*/Robot/right_hand_ring_link2",
+            prim_path="/World/envs/env_.*/Robot/right_hand_ring_tip",
             history_length=3,
             track_contact_points=True,
             max_contact_data_count_per_prim=10,
             filter_prim_paths_expr=["/World/envs/env_.*/object"],
         ),
         ContactSensorCfg(
-            prim_path="/World/envs/env_.*/Robot/right_hand_pinky_link2",
+            prim_path="/World/envs/env_.*/Robot/right_hand_pinky_tip",
             history_length=3,
             track_contact_points=True,
             max_contact_data_count_per_prim=10,
@@ -174,11 +174,11 @@ class XhandEnvCfg(SharpaWaveEnvCfg):
 
     # --- fingertip body names (same as contact sensors for xhand) ---
     fingertip_body_names = [
-        "right_hand_thumb_rota_link2",
-        "right_hand_index_rota_link2",
-        "right_hand_mid_link2",
-        "right_hand_ring_link2",
-        "right_hand_pinky_link2",
+        "right_hand_thumb_rota_tip",
+        "right_hand_index_rota_tip",
+        "right_hand_mid_tip",
+        "right_hand_ring_tip",
+        "right_hand_pinky_tip",
     ]
 
     # --- override grasp cache path for xhand ---

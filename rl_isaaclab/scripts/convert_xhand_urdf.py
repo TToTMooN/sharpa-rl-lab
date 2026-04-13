@@ -27,8 +27,8 @@ parser.add_argument(
     help="Output directory for USD",
 )
 parser.add_argument("--out_name", default="xhand_right.usd", help="Output USD filename")
-parser.add_argument("--merge_fixed", action="store_true", default=True,
-                    help="Merge fixed joints (recommended for the xhand passive linkages)")
+parser.add_argument("--merge_fixed", action="store_true", default=False,
+                    help="Merge fixed joints into parent links (off by default; xhand tip links need to stay separate for contact sensors)")
 AppLauncher.add_app_launcher_args(parser)
 args_cli, _ = parser.parse_known_args()
 # Force headless
