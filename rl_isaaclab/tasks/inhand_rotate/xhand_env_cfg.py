@@ -218,6 +218,14 @@ class XhandEnvCfg(SharpaWaveEnvCfg):
     reset_height_lower = 0.565
     reset_height_upper = 0.605
 
+    # xhand has no separate elastomer/metal materials (elastomer_material_ids=[]),
+    # so all hand materials get metal_base_friction. The SharpaWave default of 0.1
+    # is essentially frictionless — cylinder slips out of grasp immediately.
+    # Treat xhand's whole hand as if it were elastomer pads.
+    metal_base_friction = 0.8
+    elastomer_base_friction = 0.8  # unused since elastomer_material_ids=[], but consistent
+    object_base_friction = 0.8
+
     # --- override grasp cache path for xhand ---
     grasp_cache_path = "cache/xhand_grasp_linspace"
 

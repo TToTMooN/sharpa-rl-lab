@@ -195,6 +195,20 @@ class XhandGraspEnvCfg(SharpaWaveGraspEnvCfg):
     reset_height_lower = 0.565
     reset_height_upper = 0.605
 
+    # xhand has no separate elastomer/metal materials — bump friction so cylinder
+    # doesn't slip out of grasp during the gravity-cycling search.
+    metal_base_friction = 0.8
+    elastomer_base_friction = 0.8
+    object_base_friction = 0.8
+
+    # randomize_friction is False in the SharpaWave grasp cfg, which means friction
+    # is NEVER explicitly applied (uses USD defaults). For xhand the URDF-converted
+    # USD has low default friction. Enable randomize_friction with a tight range so
+    # base_friction gets multiplied by ~1.0 and applied deterministically.
+    randomize_friction = True
+    randomize_friction_scale_lower = 1.0
+    randomize_friction_scale_upper = 1.0
+
     # Start single-scale for M3 first pass
     scale_range = [0.5, 0.5, 1]
     events: EventCfg = EventCfg()
