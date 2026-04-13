@@ -182,3 +182,68 @@ Three checkpoints evaluated under identical conditions (256 envs, 256 episodes, 
 - **Multi-scale**: partial reproduction. Our stage-1 PPO is stronger than pretrained stage-2, but our distilled stage-2 underperforms. Distillation is the bottleneck. ⚠️
 
 M2 ablation work should investigate the distillation hyperparameters and loss formulation to close this gap.
+
+---
+
+# M2: Close the Distillation Gap
+
+## EXP-012: Scale-aware priv_info — Stage-1 retrain
+**Hypothesis**: Multi-scale distillation plateau (EXP-010 @ 186) is caused by adapt_tconv being unable to recover implicit scale information. Making scale an explicit priv_info dim should give the actor better information AND give adapt_tconv a cleaner mapping target.
+**Change**: `priv_info_dim` 8 → 9. `priv_info_buf[:, 8] = env_scales`. Per-env scale is linspace(0.4, 0.6, 8) matching the scale_range config.
+**Also fixed**: `--max_agent_steps` flag now works for ProprioAdapt (was hardcoded 1e9); MSE loss logged to tensorboard + console.
+**Command**: `pixi run python rl_isaaclab/scripts/train.py --task Isaac-Inhand-Rotate-Sharpa-Wave-v0 --headless --num_envs 16384`
+**Duration**: 94 min (same as EXP-009)
+**Result**:
+- **Best reward: 996.09** (vs EXP-009's 850.81) → **+17%**
+- **Final mean: 979.17** (vs EXP-009's 806.28) → **+21%**
+- Training curve uniformly ~250 reward higher than EXP-009 at every checkpoint
+**Decision**: KEEP — huge stage-1 improvement, very promising for stage-2.
+**Next**: EXP-013 distillation on this checkpoint, then eval.
+
+---
+
+## EXP-013: Distill with Scale-Aware Priv_Info
+**Hypothesis**: With scale now in priv_info, adapt_tconv can learn a cleaner proprio→embedding mapping and distillation will actually converge.
+**Change**: None beyond EXP-012 (same code base). Distill from EXP-012's `last.pth` using 100M step cap (now respected by fixed padapt.py).
+**Command**: `pixi run python rl_isaaclab/scripts/train.py --task Isaac-Inhand-Rotate-Sharpa-Wave-v0 --headless --num_envs 16384 --algorithm ProprioAdapt --max_agent_steps 100000000 --load_path logs/debug/2026-04-12_16-12-33/stage1_nn/last.pth`
+**Duration**: 31 min (100M steps, vs EXP-010's 5 hours for 1B useless steps)
+**Result**:
+- Training mean reward: 768.92 (best 810.51 at ~30M steps)
+- **Loss: 0.33 → 0.087 → 0.050 → 0.044** (monotone decrease, converged by 30M)
+- Compare to EXP-010: plateau'd at 186 training mean despite 1B steps and never learned
+**Training curve** (10M bins):
+```
+0M:   mean=200.9, best=480.5, loss=0.33
+10M:  mean=588.1, best=763.5, loss=0.087
+20M:  mean=739.4, best=804.9, loss=0.055
+30M:  mean=754.6, best=810.5, loss=0.050
+100M: mean=768.9, best=810.5, loss=0.044 (plateau)
+```
+**Decision**: KEEP — distillation actually converges, ~80% of stage-1 performance.
+
+---
+
+## EXP-014: Evaluate Scale-Aware Distilled Stage-2
+**Hypothesis**: The new stage-2 should at least match pretrained (950.38) and ideally beat the old stage-2 (878.10).
+**Outcome**: **Mean reward 1031.46** ± 208.1 over 256 episodes, **96.5% full-ep rate**, median 1081.10.
+
+### Final M2 comparison — multi-scale distillation closed
+
+| Policy | Mean | Std | Median | Full-ep | vs Pretrained |
+|--------|------|-----|--------|---------|---------------|
+| EXP-011c ours stage-2 (no scale) | 878.10 | 269.4 | 959.24 | 92.2% | **−7.6%** |
+| EXP-011b pretrained stage-2 | 950.38 | 295.9 | 1046.86 | 90.6% | — |
+| **EXP-014 ours stage-2 (scale-aware)** | **1031.46** | 208.1 | **1081.10** | **96.5%** | **+8.5%** ✅ |
+
+- **Closed the distillation gap + exceeded pretrained by +8.5%**
+- Tighter distribution (std 208 vs 296 pretrained)
+- Higher full-episode rate (96.5% vs 90.6%)
+- Higher min reward (1.77 vs -4.36) — more stable at worst-case
+
+### Root cause of M1 multi-scale distillation failure
+`priv_info` did not include object scale. In single-scale env, this was fine (only 1 scale). In multi-scale env with 8 different object sizes, the distillation target `env_mlp(priv_info)` was scale-invariant but `adapt_tconv(proprio_hist)` input was scale-dependent → the MSE loss had no consistent target across scales → adapt_tconv couldn't converge.
+
+**One-line fix**: `self.priv_info_buf[:, 8] = self.env_scales`
+
+### M2 Phase A conclusion
+**Distillation gap CLOSED in single experiment** (EXP-012+013+014). The remaining M2 Phase B/C/D ablations are now optional — the main problem is solved. Moving to M3 (generalization) is justified.

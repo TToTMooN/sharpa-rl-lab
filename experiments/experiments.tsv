@@ -13,3 +13,6 @@ id	date	milestone	description	num_envs	max_steps	duration_min	fps	best_reward	me
 011a	2026-04-12	M1	eval_ours_ms_stage1	256	-	0.7	-	1170.19	1064.64	3.2	success	KEEP	98.8% full-ep; beats pretrained stage-2
 011b	2026-04-12	M1	eval_pretrained_ms	256	-	0.7	-	1188.03	950.38	3.2	success	KEEP	90.6% full-ep; baseline for multi-scale
 011c	2026-04-12	M1	eval_ours_ms_stage2	256	-	0.7	-	1085.35	878.10	3.2	success	KEEP	92.2% full-ep; distill-gap visible vs pretrained (878 vs 950); higher stability (min 2.6 vs -4.4)
+012	2026-04-12	M2	full_ppo_priv9_multiscale	16384	300000000	94	51866	996.09	979.17	12.5	success	KEEP	scale-aware priv_info (dim 9); +17% best +21% mean vs EXP-009; logs/debug/2026-04-12_16-12-33
+013	2026-04-12	M2	distill_priv9_multiscale	16384	100000000	31	54632	810.51	768.92	12.5	success	KEEP	--max_agent_steps now works; loss 0.33→0.04; converges to ~800 vs EXP-010 stuck at 190
+014	2026-04-12	M2	eval_priv9_stage2_multiscale	256	-	0.7	-	1197.04	1031.46	3.2	success	KEEP	96.5% full-ep; BEATS pretrained (950.38) by +8.5%; CLOSES the M1 multi-scale gap
