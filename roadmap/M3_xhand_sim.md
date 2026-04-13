@@ -1,5 +1,7 @@
 # M3: Port RL Recipe to RoboEra xhand (Simulation)
 
+**Status (2026-04-13 overnight)**: 🟥 **BLOCKED on grasp cache generation.** URDF→USD import, HandSpec refactor, VLM visual diagnostic pipeline, and synth-cache fallback all landed. Gravity-cycling grasp gen fails because xhand's 12-DOF flat-cup pose geometrically cannot wrap a cylinder (4 fingers form a near-flat y-wall with only ~27mm x-span, so no single cylindrical surface fits all fingers — see `memory/project_xhand_cage_limit.md`). Synth-cache-seeded PPO at 4096 envs, 3M steps, plateaued at mean reward **-3230** with no learning signal (vs SharpaWave's +19 at 2M). Cylinder drops immediately, no rotation reward. **Needs user input on next direction**; options listed in "M3 next steps" below.
+
 **Goal**: Reproduce the M1/M2A results on the xhand (12 DOF) in Isaac Lab. Prove the SHARPA RL recipe (PPO + ProprioAdapt) is hand-agnostic at the algorithm level, and build a second in-sim baseline for cross-hand ablations (M2B/C/D) and real-hand deployment (M5).
 
 **Depends on**:
@@ -162,3 +164,27 @@ Direct port once we have the asset. Same sequence as M3-B:
 - Reward-curve plot comparing SharpaWave vs Allegro on cylinder rotation
 - Documented porting guide (`docs/porting_new_hand.md` or in this roadmap)
 - xhand integration if URDF becomes available
+
+## M3 next steps (blocked — need decision)
+
+The grasp cache blocker is geometric, not tunable. Options in increasing effort order:
+
+1. **Reference dexscrew's xhand config** (<https://github.com/x-robotics-lab/dexscrew/tree/main/assets/xhand_left>). They may have a working grasp prior or a different object shape that suits xhand's kinematics. Cheapest path forward.
+
+2. **Change the object**: xhand was not designed to wrap a cylinder — its natural grasp is a cradle/pinch. Try a cube or sphere instead. SHARPA's published results are cylinder-specific, but a different object for xhand could still demonstrate the recipe's hand-agnosticism.
+
+3. **Different grasp style**: abandon wrap-grasp and use a "cylinder on palm + fingers close over" power grasp. Requires adding palm as a contact body and a differently-structured init pose. May also need reward shaping.
+
+4. **Hand orientation rework**: rotate the hand so the palm faces up, letting gravity hold the cylinder in the cup. VLM iterations so far kept the default rot `(0.819, 0, -0.574, 0)` which points the palm sideways.
+
+5. **Custom grasp-gen reward**: rewrite `SharpaWaveInhandRotateGraspEnv._get_rewards` so it accepts weaker (1- or 2-finger + palm) contact configurations that are feasible for xhand.
+
+All five are user-facing decisions — will pause M3 until next session.
+
+Related artifacts (2026-04-13 overnight):
+- `rl_isaaclab/scripts/synth_xhand_cache.py` — synthetic cache generator (50k perturbed poses)
+- `cache/xhand_grasp_linspace_1.0-1.0-1.npy` — current (non-functional) cache
+- `experiments/screenshots/xhand_20260413_0[01]*_report.md` — 5 VLM iteration reports
+- `rl_isaaclab/tasks/inhand_rotate/xhand_env_cfg.py` — wrap pose + explicit PD gains
+- `experiments/exp022*.log` — grasp-gen failure diagnostics
+- `experiments/exp023_xhand_ppo_{smoke,full}.log` — PPO training attempts

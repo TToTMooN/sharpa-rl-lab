@@ -25,3 +25,4 @@ id	date	milestone	description	num_envs	max_steps	duration_min	fps	best_reward	me
 022h	2026-04-13	M3	xhand_grasp_gen_iter3pose	256	-	5	-	-	-	-	fail	REVERT	iter3 wrap pose in real physics: thumb tucks under palm, 4 fingers drift
 022i	2026-04-13	M3	xhand_pd_gains_20	256	-	3	-	-	-	-	fail	REVERT	explicit stiffness=20 didn't help — root cause is cage geometry not PD
 022j	2026-04-13	M3	xhand_synth_cache	-	-	1	-	-	-	-	success	KEEP	50k perturbed-pose synthetic cache generated; bypasses broken grasp gen
+023	2026-04-13	M3	xhand_ppo_synth_cache	4096	3000000	15	4850	-3206.78	-3230	8.0	fail	BLOCKED	flat reward at -3200; synth cache not a real grasp so cylinder drops immediately, no rotation reward signal. M3 blocked on grasp cage — see roadmap/M3_xhand_sim.md
