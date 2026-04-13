@@ -1,6 +1,6 @@
 # M2: Ablation & Distillation Gap
 
-**Status**: **Phase A complete** (distillation gap closed). **Phase B/C/D deferred to post-M3** (see bottom of file).
+**Status**: **Phase A complete** (distillation gap closed). **Phase B/C/D deferred to post-M3, before M4/M5** (see bottom of file).
 
 **Goal**: Close the multi-scale distillation gap (EXP-011: our 878 vs pretrained 950) and understand which components of the SHARPA RL recipe are load-bearing.
 
@@ -29,11 +29,11 @@
 
 ## Phase B/C/D — DEFERRED until between M3 and M4
 
-**Rationale for deferring**: Phase A solved the immediate problem (distillation gap). The remaining phases are about *understanding* the recipe, which is most valuable right before M4 (sim2real on xhand). Running ablations now would delay M3 without a clear payoff; running them between M3 and M4 means:
-1. We'll know the recipe works on a second hand (xhand) before ablating
-2. Ablations can be run on BOTH SharpaWave and xhand baselines → stronger conclusions
-3. Reward design understanding is load-bearing for M4 (real hardware tuning)
-4. M4 reproduction on xhand needs these insights — guessing reward weights on new hardware is risky
+**Rationale for deferring**: Phase A solved the immediate problem (distillation gap). The remaining phases are about *understanding* the recipe, which is most valuable right before real hardware deployment (M4 SharpaWave and M5 xhand). Running ablations now would delay M3 without a clear payoff; running them between M3 and the sim2real milestones means:
+1. We'll know the recipe works on a second hand (xhand in sim) before ablating
+2. Ablations can be run on BOTH SharpaWave and xhand baselines → stronger conclusions about what's recipe-level vs hand-specific
+3. Reward design understanding is load-bearing for real hardware tuning
+4. Real hardware deployment needs these insights — guessing reward weights on new hardware is risky
 
 **Re-entry point**: After M3 delivers a working xhand baseline. Label experiments M2B-*, M2C-*, M2D-* to distinguish from M2 Phase A (which is done).
 

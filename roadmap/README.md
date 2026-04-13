@@ -15,7 +15,7 @@ Each milestone gets its own file. Experiments in `experiments/experiments.tsv` r
 | Repo | Purpose | Relation to this work |
 |------|---------|----------------------|
 | **sharpa-rl-lab** (this repo) | RL sim2real demo for in-hand rotation | — |
-| **sharpa-tacmap** | Tactile sensor integration in Isaac Lab | M2/M3: needed for higher-fidelity tactile sim |
+| **sharpa-tacmap** | Tactile sensor integration in Isaac Lab | M2/M4: higher-fidelity tactile sim |
 | **sharpa-urdf-usd-xml** | SharpaWave hardware asset files | Already vendored in `assets/SharpaWave/` |
 | **sharpa-tactile-sensor-assets** | Static tactile sensor component files | Already vendored in `assets/tactile_ha4_map/` |
 | **sharpa-manus-sdk** | Manus MetaGloves Pro teleop SDK | M4: useful for collecting demo data |
@@ -36,20 +36,38 @@ Each milestone gets its own file. Experiments in `experiments/experiments.tsv` r
 
 ## Milestones
 
-| ID | Title | Status | Experiments |
-|----|-------|--------|-------------|
-| M1 | [Reproduce SHARPA RL results](M1_reproduce_sharpa.md) | ✅ done | EXP-000..011c |
-| M2A | [Close distillation gap](M2_ablation.md) (Phase A) | ✅ done | EXP-012..014 |
-| **M3** | [Generalize to RoboEra xhand](M3_extend.md) | **in progress** | EXP-015+ |
-| M2B/C/D | [Component ablations + reward decomp + profiling](M2_ablation.md) | **deferred (between M3 and M4)** | — |
-| M4 | [Sim2real & deployment on xhand](M4_sim2real.md) | planned | — |
+Two parallel tracks:
+- **Track A** — SharpaWave (the original SHARPA RL target; hardware on the way)
+- **Track B** — RoboEra xhand (we have URDFs + SDK locally; smaller 12-DOF hand for generalization)
+
+| ID | Track | Title | Status | Experiments |
+|----|-------|-------|--------|-------------|
+| M1 | A | [Reproduce SHARPA RL results (SharpaWave sim)](M1_reproduce_sharpa.md) | ✅ done | EXP-000..011c |
+| M2A | A | [Close distillation gap](M2_ablation.md) (Phase A) | ✅ done | EXP-012..014 |
+| **M3** | B | [Port RL recipe to xhand (sim)](M3_xhand_sim.md) | **in progress** | EXP-015+ |
+| M2B/C/D | A+B | [Component ablations + reward decomp + profiling](M2_ablation.md) | deferred until after M3 | — |
+| M4 | A | [SharpaWave sim2real deployment](M4_sharpa_sim2real.md) | blocked on hardware arrival | — |
+| M5 | B | [xhand sim2real deployment](M5_xhand_sim2real.md) | blocked on M3 completion | — |
+
+### Track details
+
+**Track A (SharpaWave)** — the canonical reproduction:
+1. ✅ **M1**: Reproduce SHARPA's published single-scale + multi-scale results in sim
+2. ✅ **M2A**: Fix the multi-scale distillation gap (root cause: scale missing from priv_info)
+3. 🟡 **M4** (blocked): Deploy our trained policies on physical SharpaWave once hardware arrives
+
+**Track B (RoboEra xhand)** — generalization proof + second hardware target:
+1. 🟡 **M3** (active): Port the full recipe to xhand in sim — asset conversion, HandSpec refactor, grasp cache, PPO, distill, eval. Prove the recipe is hand-agnostic.
+2. 🟡 **M5** (blocked on M3): Deploy xhand-trained policies on physical xhand (local hardware available)
+
+**Cross-track (M2B/C/D)**: Component ablations + reward decomposition + profiling. Deferred until after M3 so we can run ablations on **both hands** for stronger conclusions. These inform both M4 and M5.
 
 ## Execution order
 
 1. ✅ M1 — Reproduce SHARPA on SharpaWave (both single-scale and multi-scale)
-2. ✅ M2 Phase A — Close the distillation gap (found root cause: scale missing from priv_info)
-3. **→ M3 — Port recipe to RoboEra xhand** (URDF + 12 DOF, grasp cache, retrain, distill, eval)
-4. M2 Phase B/C/D — Component ablations + reward decomposition + profiling, now on BOTH SharpaWave and xhand → better informed conclusions
-5. M4 — Sim2real deployment on real xhand, using insights from steps 3+4
+2. ✅ M2A — Close the distillation gap
+3. **→ M3 — Port recipe to xhand in simulation** (in progress: URDF conversion, HandSpec refactor, grasp cache, training)
+4. M2 Phase B/C/D — Component ablations on both SharpaWave AND xhand baselines
+5. M4 + M5 — sim2real deployments in parallel once respective hardware is ready
 
-**Why this order?** M2 B/C/D is about *understanding* the recipe so we can tune it on new hardware. It's most useful right before M4, and doing it after M3 means we can run each ablation on two hands instead of one — stronger claims about which components generalize.
+**Why M3 first vs M4**: SharpaWave hardware hasn't arrived yet. xhand hardware is available locally. Running M3 in sim on xhand exercises the whole pipeline under a new hand, proves the recipe is portable, and provides the second baseline for M2B/C/D ablations. When SharpaWave arrives, M4 can proceed in parallel with M5.

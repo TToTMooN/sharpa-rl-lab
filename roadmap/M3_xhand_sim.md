@@ -1,10 +1,17 @@
-# M3: Generalize — New Tasks & New Hands
+# M3: Port RL Recipe to RoboEra xhand (Simulation)
 
-**Goal**: Prove the SHARPA RL recipe (PPO + ProprioAdapt + Isaac Lab) works as a **reusable tool**, not just a SharpaWave-only demo. Generalize across tasks *and* embodiments.
+**Goal**: Reproduce the M1/M2A results on the xhand (12 DOF) in Isaac Lab. Prove the SHARPA RL recipe (PPO + ProprioAdapt) is hand-agnostic at the algorithm level, and build a second in-sim baseline for cross-hand ablations (M2B/C/D) and real-hand deployment (M5).
 
-**Depends on**: M1 (working baseline), M2 (know which components are load-bearing)
+**Depends on**:
+- M1 ✅ (SharpaWave baseline for reference)
+- M2A ✅ (scale-aware priv_info fix — needed for multi-scale distillation)
 
-**Core thesis**: A dex-manipulation training recipe is hand-agnostic at the algorithm level but hand-specific at the asset / obs-shape / grasp-cache level. M3 verifies this and produces a templated path to swap hands or tasks.
+**Out of scope** (moved to later milestones):
+- M2 Phase B/C/D ablations → run after M3 on BOTH hands
+- Real xhand deployment → **M5** (new milestone, xhand-specific sim2real)
+- Real SharpaWave deployment → **M4** (blocked on hardware arrival)
+
+**Core thesis**: A dex-manipulation training recipe is hand-agnostic at the algorithm level but hand-specific at the asset / obs-shape / grasp-cache / reward-tuning level. M3 verifies this on xhand and produces a templated path to swap hands.
 
 ## Part A — What's hand-specific vs hand-agnostic in this codebase
 

@@ -1,0 +1,97 @@
+Loading user config located at: '/home/lingfeng/playground/sharpa-rl-lab/.pixi/envs/default/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/lingfeng/playground/sharpa-rl-lab/.pixi/envs/default/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260412_214950.log
+2026-04-13T01:49:50Z [56ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
+2026-04-13T01:49:50Z [208ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
+2026-04-13T01:49:50Z [298ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
+2026-04-13T01:49:50Z [302ms] [Warning] [omni.isaac.dynamic_control] omni.isaac.dynamic_control is deprecated as of Isaac Sim 4.5. No action is needed from end-users.
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 580.126.09    | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA GeForce RTX 5090          | Yes: 0 |     | 32607   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2b85      | 73366f21.. |
+|     |                                  |        |     |            | 1         |            |
+|=============================================================================================|
+| OS: 24.04.3 LTS (Noble Numbat) ubuntu, Version: 24.04.3, Kernel: 6.17.0-19-generic
+| Processor: AMD Ryzen 9 9900X 12-Core Processor
+| Cores: 12 | Logical Cores: 24
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 61829 | Free Memory: 56480
+| Total Page/Swap (MB): 8191 | Free Page/Swap: 8191
+|---------------------------------------------------------------------------------------------|
+2026-04-13T01:49:52Z [2,208ms] [Warning] [gpu.foundation.plugin] CPU performance profile is set to powersave. This profile sets the CPU to the lowest frequency reducing performance.
+2026-04-13T01:49:52Z [2,218ms] [Warning] [gpu.foundation.plugin] IOMMU is enabled.
+2026-04-13T01:49:52Z [2,358ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.
+2026-04-13T01:49:52Z [2,358ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 580.126.09    | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA GeForce RTX 5090          | Yes: 0 |     | 32607   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2b85      | 73366f21.. |
+|     |                                  |        |     |            | 1         |            |
+|=============================================================================================|
+| OS: 24.04.3 LTS (Noble Numbat) ubuntu, Version: 24.04.3, Kernel: 6.17.0-19-generic
+| Processor: AMD Ryzen 9 9900X 12-Core Processor
+| Cores: 12 | Logical Cores: 24
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 61829 | Free Memory: 56269
+| Total Page/Swap (MB): 8191 | Free Page/Swap: 8191
+|---------------------------------------------------------------------------------------------|
+2026-04-13T01:49:52Z [2,598ms] [Warning] [gpu.foundation.plugin] CPU performance profile is set to powersave. This profile sets the CPU to the lowest frequency reducing performance.
+2026-04-13T01:49:52Z [2,599ms] [Warning] [gpu.foundation.plugin] IOMMU is enabled.
+2026-04-13T01:49:53Z [2,803ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.
+2026-04-13T01:49:53Z [2,803ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)
+2026-04-13T01:49:53Z [2,814ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.
+2026-04-13T01:49:53Z [2,814ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)
+2026-04-13T01:49:53Z [2,818ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.
+2026-04-13T01:49:53Z [2,818ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)
+2026-04-13T01:49:53Z [2,822ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.
+2026-04-13T01:49:53Z [2,822ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)
+2026-04-13T01:49:53Z [2,823ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.
+2026-04-13T01:49:53Z [2,823ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)
+2026-04-13T01:49:53Z [2,824ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.
+2026-04-13T01:49:53Z [2,824ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)
+2026-04-13T01:49:53Z [3,089ms] [Warning] [omni.graph.visualization.nodes._impl.extension] No Viewport Window to add omni.graph.visualization.nodes-2.1.3 scene to
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] DEPRECATION WARNING: Merging bodies with inertia is deprecated. This will be removed in a future release.
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] link right_hand_back_link has body properties (mass, inertia, or collisions) and is being merged into right_hand_link
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] DEPRECATION WARNING: Merging bodies with inertia is deprecated. This will be removed in a future release.
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] link right_hand_ee_link has body properties (mass, inertia, or collisions) and is being merged into right_hand_link
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] DEPRECATION WARNING: Merging bodies with inertia is deprecated. This will be removed in a future release.
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] link right_hand_index_rota_tip has body properties (mass, inertia, or collisions) and is being merged into right_hand_index_rota_link2
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] DEPRECATION WARNING: Merging bodies with inertia is deprecated. This will be removed in a future release.
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] link right_hand_index_rotaback_link2 has body properties (mass, inertia, or collisions) and is being merged into right_hand_index_rota_link2
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] DEPRECATION WARNING: Merging bodies with inertia is deprecated. This will be removed in a future release.
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] link right_hand_index_rotaback_link1 has body properties (mass, inertia, or collisions) and is being merged into right_hand_index_rota_link1
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] DEPRECATION WARNING: Merging bodies with inertia is deprecated. This will be removed in a future release.
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] link right_hand_mid_tip has body properties (mass, inertia, or collisions) and is being merged into right_hand_mid_link2
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] DEPRECATION WARNING: Merging bodies with inertia is deprecated. This will be removed in a future release.
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] link right_hand_midback_link2 has body properties (mass, inertia, or collisions) and is being merged into right_hand_mid_link2
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] DEPRECATION WARNING: Merging bodies with inertia is deprecated. This will be removed in a future release.
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] link right_hand_midback_link1 has body properties (mass, inertia, or collisions) and is being merged into right_hand_mid_link1
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] DEPRECATION WARNING: Merging bodies with inertia is deprecated. This will be removed in a future release.
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] link right_hand_pinky_tip has body properties (mass, inertia, or collisions) and is being merged into right_hand_pinky_link2
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] DEPRECATION WARNING: Merging bodies with inertia is deprecated. This will be removed in a future release.
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] link right_hand_pinkyback_link2 has body properties (mass, inertia, or collisions) and is being merged into right_hand_pinky_link2
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] DEPRECATION WARNING: Merging bodies with inertia is deprecated. This will be removed in a future release.
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] link right_hand_pinkyback_link1 has body properties (mass, inertia, or collisions) and is being merged into right_hand_pinky_link1
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] DEPRECATION WARNING: Merging bodies with inertia is deprecated. This will be removed in a future release.
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] link right_hand_ring_tip has body properties (mass, inertia, or collisions) and is being merged into right_hand_ring_link2
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] DEPRECATION WARNING: Merging bodies with inertia is deprecated. This will be removed in a future release.
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] link right_hand_ringback_link2 has body properties (mass, inertia, or collisions) and is being merged into right_hand_ring_link2
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] DEPRECATION WARNING: Merging bodies with inertia is deprecated. This will be removed in a future release.
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] link right_hand_ringback_link1 has body properties (mass, inertia, or collisions) and is being merged into right_hand_ring_link1
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] DEPRECATION WARNING: Merging bodies with inertia is deprecated. This will be removed in a future release.
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] link right_hand_thumb_rota_tip has body properties (mass, inertia, or collisions) and is being merged into right_hand_thumb_rota_link2
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] DEPRECATION WARNING: Merging bodies with inertia is deprecated. This will be removed in a future release.
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] link right_hand_thumb_rotaback_link2 has body properties (mass, inertia, or collisions) and is being merged into right_hand_thumb_rota_link2
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] DEPRECATION WARNING: Merging bodies with inertia is deprecated. This will be removed in a future release.
+2026-04-13T01:49:53Z [3,116ms] [Warning] [isaacsim.asset.importer.urdf] link right_hand_thumb_rotaback_link1 has body properties (mass, inertia, or collisions) and is being merged into right_hand_thumb_rota_link1

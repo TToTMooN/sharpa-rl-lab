@@ -7,12 +7,23 @@ Reinforcement learning sim2real pipeline for **in-hand object rotation** using t
 **Goal**: Learn and generalize the SHARPA RL library as a tool. Reproduce their published results first, then extend.
 
 ## Status
-- **M1 single-scale [0.5]**: ✅ Reproduced and exceeded. Stage-2 eval reward **1137.66** vs pretrained **1040.63** (+9.3%).
-- **M1 multi-scale [0.4, 0.6, 8]**: ✅ Reproduced and exceeded after M2 fix. Stage-2 eval **1031.46** vs pretrained **950.38** (+8.5%).
-- **M2 distillation gap**: ✅ Closed. Root cause: `priv_info` lacked object scale, making the MSE target ambiguous across 8 scales. One-line fix: `priv_info_buf[:, 8] = env_scales` (dim 8→9).
-- **M3**: Generalize — port to RoboEra xhand (URDF in `~/Downloads/XHAND1_URDF_ver 1.3.zip`).
-- **M4**: Sim2real deployment.
-- See `roadmap/` for detail.
+
+Two parallel tracks:
+
+**Track A — SharpaWave** (hardware on the way):
+- **M1 single-scale**: ✅ Reproduced and exceeded. Stage-2 eval **1137.66** vs pretrained **1040.63** (+9.3%).
+- **M1 multi-scale**: ✅ Reproduced and exceeded after M2 fix. Stage-2 eval **1031.46** vs pretrained **950.38** (+8.5%).
+- **M2A distillation gap**: ✅ Closed. Root cause: `priv_info` lacked object scale. One-line fix: `priv_info_buf[:, 8] = env_scales`.
+- **M4 sim2real**: 🟡 Blocked on SharpaWave hardware arrival.
+
+**Track B — RoboEra xhand** (hardware available locally):
+- **M3 xhand sim**: 🟡 In progress. URDF→USD converted (12 DOF, 13 joints). Next: HandSpec refactor, grasp cache, PPO training.
+- **M5 xhand sim2real**: 🟡 Blocked on M3 completion.
+
+**Cross-track**:
+- **M2B/C/D** (component ablations, reward decomposition, profiling): deferred to post-M3, before M4/M5. Will be run on both hands for stronger conclusions.
+
+See `roadmap/` for detail.
 
 ## Architecture
 
