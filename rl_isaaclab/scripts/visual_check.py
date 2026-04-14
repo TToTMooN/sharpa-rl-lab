@@ -258,17 +258,25 @@ def main():
     )
     hand = Articulation(hand_cfg)
 
-    # Cylinder
+    # Cylinder — parametric with bright color for visibility (hand is white,
+    # loading the USD-textured cylinder gave near-white output which confused
+    # both my eye and the VLM). Dimensions match the USD cylinder scaled:
+    # base radius 0.04m, length 0.064m (scale=1.0 matches USD), so --obj_scale
+    # multiplies these.
+    base_radius = 0.04 * args_cli.obj_scale
+    base_height = 0.064 * args_cli.obj_scale
     obj_cfg = RigidObjectCfg(
         prim_path="/World/Cylinder",
-        spawn=sim_utils.UsdFileCfg(
-            usd_path=CYLINDER_USD,
+        spawn=sim_utils.CylinderCfg(
+            radius=base_radius,
+            height=base_height,
             rigid_props=sim_utils.RigidBodyPropertiesCfg(
                 disable_gravity=False,
                 enable_gyroscopic_forces=True,
             ),
             mass_props=sim_utils.MassPropertiesCfg(mass=0.05),
-            scale=(args_cli.obj_scale,) * 3,
+            collision_props=sim_utils.CollisionPropertiesCfg(collision_enabled=True),
+            visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.85, 0.15, 0.15), metallic=0.1),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(pos=CYL_INIT_POS, rot=CYL_INIT_ROT),
     )
@@ -356,6 +364,21 @@ def main():
         hand.update(sim.cfg.dt)
         obj.update(sim.cfg.dt)
         cam.update(dt=sim.cfg.dt)
+
+    # Dump fingertip world positions so we can compute cylinder placement
+    # without running gen_grasp.
+    body_names = hand.data.body_names
+    body_pos = hand.data.body_pos_w[0]
+    fingertip_keywords = ("thumb_rota_tip", "index_rota_tip", "mid_tip", "ring_tip", "pinky_tip")
+    print("[VIZ FINGERTIPS]", flush=True)
+    for kw in fingertip_keywords:
+        for i, n in enumerate(body_names):
+            if n.endswith(kw):
+                p = body_pos[i].tolist()
+                print(f"  {n}: ({p[0]:+.4f}, {p[1]:+.4f}, {p[2]:+.4f})", flush=True)
+                break
+    obj_p = obj.data.root_pos_w[0].tolist()
+    print(f"[VIZ OBJECT] cylinder_pos: ({obj_p[0]:+.4f}, {obj_p[1]:+.4f}, {obj_p[2]:+.4f})", flush=True)
 
     # Grab screenshot
     rgb = cam.data.output["rgb"][0]  # [H, W, 3] or [H, W, 4]

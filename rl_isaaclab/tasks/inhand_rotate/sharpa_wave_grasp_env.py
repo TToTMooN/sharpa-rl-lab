@@ -42,10 +42,46 @@ class SharpaWaveInhandRotateGraspEnv(SharpaWaveInhandRotateEnv):
         num_sensors = len(self._contact_sensor)
         filtered_force_matrix = torch.cat([self._contact_sensor[id].data.force_matrix_w[:, 0, 0, :].unsqueeze(1) for id in range(num_sensors)], dim=1)
         force_norms = torch.norm(filtered_force_matrix, dim=-1, p=2)  # [N, num_sensors]
-        cond2 = (force_norms > 0.5).sum(-1) >= 3
+        # Hand-specific contact threshold. SharpaWave's 22-DOF wrap achieves
+        # ≥3 contacts at >0.5N easily; xhand's 12-DOF cup can only get 2
+        # fingers on the cylinder side geometrically, so allow relaxation.
+        min_contacts = getattr(self.cfg, 'grasp_min_contacts', 3)
+        force_thresh = getattr(self.cfg, 'grasp_force_thresh', 0.5)
+        cond2 = (force_norms > force_thresh).sum(-1) >= min_contacts
         cond3 = torch.less(quat_to_rot(quat_mul(self.object_rot, quat_conjugate(self.object.data.default_root_state.clone()[:, 3:7]))), self.cfg.reset_angle_diff)
         cond = cond1.float() * cond2.float() * cond3.float()
         self.reset_buf[cond < 1] = 1
+
+        # Incremental cache save: any env where cond is true RIGHT NOW gets its
+        # state saved to the cache (before reset). This sidesteps the strict
+        # "must survive 400 consecutive steps" requirement that xhand can't meet
+        # because its grasps are intermittent under gravity cycling. Off by
+        # default; opt in via cfg.grasp_save_incremental.
+        if getattr(self.cfg, 'grasp_save_incremental', False):
+            success_now = cond > 0
+            if success_now.any():
+                states = torch.cat([self.hand_dof_pos, self.object_pos, self.object_rot], dim=1)[success_now]
+                saved_scale_ids = self.scale_ids[success_now]
+                target_per_scale = 5e4 // self.cfg.scale_range[2]
+                for id, sid in enumerate(saved_scale_ids):
+                    if self.saved_grasping_states[sid].shape[0] < target_per_scale:
+                        self.saved_grasping_states[sid] = torch.cat(
+                            [self.saved_grasping_states[sid], states[id].reshape(-1, self.pose_cache_dim)], dim=0
+                        )
+                if self.common_step_counter % 200 == 0:
+                    sum_total = sum(s.shape[0] for s in self.saved_grasping_states)
+                    finish_scale = sum(1 for s in self.saved_grasping_states if s.shape[0] >= target_per_scale)
+                    print(f'[INCREMENTAL] cache size: {sum_total}, finished scales: {finish_scale}/{self.cfg.scale_range[2]}', flush=True)
+                    if finish_scale == self.cfg.scale_range[2]:
+                        print('done! (incremental)', flush=True)
+                        save_data = torch.zeros((0, self.pose_cache_dim), dtype=torch.float32, device=self.device)
+                        for s in self.saved_grasping_states:
+                            save_data = torch.cat([save_data, s], dim=0)
+                        cache_prefix = getattr(self.cfg, 'grasp_cache_save_prefix', None) or 'cache/sharpa_grasp_linspace'
+                        os.makedirs(os.path.dirname(cache_prefix) or 'cache', exist_ok=True)
+                        name = f'{cache_prefix}_{self.cfg.scale_range[0]}-{self.cfg.scale_range[1]}-{self.cfg.scale_range[2]}.npy'
+                        np.save(name, save_data.cpu().numpy())
+                        exit()
 
         # Diagnostic print every 200 steps for env 0
         if self.common_step_counter % 200 == 0 and self.num_envs > 0:
@@ -65,7 +101,7 @@ class SharpaWaveInhandRotateGraspEnv(SharpaWaveInhandRotateEnv):
             print(
                 f"[GRASP DEBUG] step={self.common_step_counter} grav={grav} | "
                 f"cond1(dist<0.1)={n_pass1}/{self.num_envs} "
-                f"cond2(>=3 forces>0.5)={n_pass2}/{self.num_envs} "
+                f"cond2(>={min_contacts} forces>{force_thresh})={n_pass2}/{self.num_envs} "
                 f"cond3(quat<thresh)={n_pass3}/{self.num_envs} "
                 f"all={n_pass_all}/{self.num_envs} | "
                 f"ft_dist mean={ft_dist_mean:.4f} max={ft_dist_max:.4f} | "

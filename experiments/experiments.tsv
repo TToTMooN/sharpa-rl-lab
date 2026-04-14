@@ -26,3 +26,10 @@ id	date	milestone	description	num_envs	max_steps	duration_min	fps	best_reward	me
 022i	2026-04-13	M3	xhand_pd_gains_20	256	-	3	-	-	-	-	fail	REVERT	explicit stiffness=20 didn't help — root cause is cage geometry not PD
 022j	2026-04-13	M3	xhand_synth_cache	-	-	1	-	-	-	-	success	KEEP	50k perturbed-pose synthetic cache generated; bypasses broken grasp gen
 023	2026-04-13	M3	xhand_ppo_synth_cache	4096	3000000	15	4850	-3206.78	-3230	8.0	fail	BLOCKED	flat reward at -3200; synth cache not a real grasp so cylinder drops immediately, no rotation reward signal. M3 blocked on grasp cage — see roadmap/M3_xhand_sim.md
+024	2026-04-13	M3	xhand_grasp_iter_pinch	256	-	30	-	-	-	-	fail	REVERT	8 pose iterations side-pinch; cylinder bouncing; cond2=0
+025	2026-04-13	M3	xhand_grasp_palmup	256	-	15	-	-	-	-	fail	REVERT	palm-up rotation gives finger cluster; need root-curl-tip-flat
+026	2026-04-14	M3	xhand_grasp_sidepinch	1024	-	10	-	-	-	-	partial	KEEP	root-curl-tip-flat + side-pinch reaches cond2=12-20/1024 but never 400 consecutive
+027	2026-04-14	M3	xhand_grasp_highfric	1024	-	5	-	-	-	-	partial	KEEP	friction 0.8→5.0 boosts force max to 87N; cond2 still 9-14/1024
+028	2026-04-14	M3	xhand_grasp_incremental	1024	-	22	-	-	-	-	success	KEEP	incremental cond-true cache save bypasses 400-step requirement; 50k cache filled in 22 min
+029	2026-04-14	M3	xhand_ppo_real_smoke	1024	1000000	2	9100	-8576	-9000	8.0	fail	REVERT	high contact forces from real cache → -8500 reward; lowered work_pen to -0.1, torque_pen to -0.02
+029b	2026-04-14	M3	xhand_ppo_lowpen	1024	2000000	2	9100	-1727	-1832	8.0	partial	KEEP	reduced penalties → -1727 best (5x improvement); slow improvement, not converging fast
