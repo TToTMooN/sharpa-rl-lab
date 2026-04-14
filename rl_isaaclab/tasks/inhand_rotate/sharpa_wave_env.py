@@ -281,6 +281,7 @@ class SharpaWaveInhandRotateEnv(DirectRLEnv):
         self.extras['height_reset_upper'] = height_reset_upper.float().mean()
         self.extras['height_reset_lower'] = height_reset_lower.float().mean()
         self.extras['time_out'] = time_out.float().mean()
+        # Reset-rate-gated SharpaWave gravity curriculum (existing):
         if self.extras['height_reset_upper'] < 5e-4 and self.extras['height_reset_lower'] < 5e-4 and self.cfg.gravity_curriculum and self.common_step_counter > 1000:
             gravity_amp = self.physics_sim_view.get_gravity()
             gravity_amp = torch.sqrt(torch.tensor(gravity_amp[0]**2+gravity_amp[1]**2+gravity_amp[2]**2))
@@ -288,6 +289,22 @@ class SharpaWaveInhandRotateEnv(DirectRLEnv):
                 new_gravity = carb.Float3(0.0, 0.0, -gravity_amp - 0.05)
                 self.physics_sim_view.set_gravity(new_gravity)
                 print(f"update gravity: {new_gravity}")
+
+        # Step-scheduled gravity curriculum (xhand path): linearly interpolate
+        # the z-component of gravity between keypoints on a common_step_counter
+        # schedule. This bypasses the reset-rate gate that xhand never satisfies.
+        # cfg.gravity_schedule is a list of (step, gravity_z) tuples, monotonic
+        # in step. Opt-in: if None, use the original curriculum above.
+        schedule = getattr(self.cfg, 'gravity_schedule', None)
+        if schedule is not None:
+            step = self.common_step_counter
+            g_z = _interp_schedule(step, schedule)
+            cur = self.physics_sim_view.get_gravity()
+            # Only update if changed by > 0.01 to avoid per-step API calls.
+            if abs(cur[2] - g_z) > 0.01:
+                self.physics_sim_view.set_gravity(carb.Float3(0.0, 0.0, g_z))
+                if self.common_step_counter % 200 == 0:
+                    print(f"[gravity schedule] step={step} gravity_z={g_z:.3f}", flush=True)
         return height_reset, time_out
 
     def _rand_pd_scales(self, lower, upper, num_envs, n_dofs):
@@ -559,6 +576,31 @@ def quat_rotate(q: torch.Tensor, v: torch.Tensor) -> torch.Tensor:
     # rotate: q * v * q^-1
     v_rot = quat_mul(quat_mul(q, v_as_quat), quat_inv(q))
     return v_rot[..., 1:]  # drop scalar part
+
+
+def _interp_schedule(step: int, schedule: list) -> float:
+    """Linear-interpolate a scalar value on a (step, value) schedule.
+
+    Args:
+        step: Current step count.
+        schedule: List of (step, value) tuples, monotonic in step.
+
+    Returns:
+        Interpolated value at the given step, clamped to the endpoints.
+    """
+    if not schedule:
+        return 0.0
+    if step <= schedule[0][0]:
+        return schedule[0][1]
+    if step >= schedule[-1][0]:
+        return schedule[-1][1]
+    for i in range(len(schedule) - 1):
+        s0, v0 = schedule[i]
+        s1, v1 = schedule[i + 1]
+        if s0 <= step <= s1:
+            alpha = (step - s0) / max(1, s1 - s0)
+            return v0 + alpha * (v1 - v0)
+    return schedule[-1][1]
 
 
 @torch.jit.script

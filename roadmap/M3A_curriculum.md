@@ -19,6 +19,28 @@ If we:
 
 then PPO will first learn a stable hold policy, and rotation will follow naturally as a perturbation of the hold policy.
 
+## Scope note (2026-04-14 clarification)
+
+Curriculum lives at two levels, both valid and orthogonal:
+
+1. **In-training curriculum** (this thread's current work): within a single
+   training run, gradually change the env difficulty — gravity, penalties,
+   object mass, etc. — via step-scheduled interpolation. Single PPO checkpoint,
+   no stage handoff. Cheap and directly addresses the -1000 plateau caused by
+   reset-on-drop. The `gravity_schedule` field in `xhand_env_cfg.py` (read by
+   `sharpa_wave_env._get_dones`) implements this.
+
+2. **Task-content curriculum** (future elevation): SEPARATE training runs for
+   qualitatively different sub-goals ("hold only", "hold+rotate", "rotate
+   different objects"), with a VLM-driven planner deciding what sub-goal to
+   attempt next based on current policy performance. Each sub-goal produces a
+   checkpoint that feeds the next. This is a level ABOVE the in-training
+   curriculum and is an ELEVATION, not a replacement — it builds on top.
+   Deferred until the in-training curriculum either succeeds or proves
+   insufficient.
+
+This document is scoped to level 1.
+
 ## Plan
 
 ### Step 1 — Verify gravity state (fastest check)
