@@ -33,3 +33,7 @@ id	date	milestone	description	num_envs	max_steps	duration_min	fps	best_reward	me
 028	2026-04-14	M3	xhand_grasp_incremental	1024	-	22	-	-	-	-	success	KEEP	incremental cond-true cache save bypasses 400-step requirement; 50k cache filled in 22 min
 029	2026-04-14	M3	xhand_ppo_real_smoke	1024	1000000	2	9100	-8576	-9000	8.0	fail	REVERT	high contact forces from real cache → -8500 reward; lowered work_pen to -0.1, torque_pen to -0.02
 029b	2026-04-14	M3	xhand_ppo_lowpen	1024	2000000	2	9100	-1727	-1832	8.0	partial	KEEP	reduced penalties → -1727 best (5x improvement); slow improvement, not converging fast
+030	2026-04-14	M3	xhand_sphere_grasp	1024	-	22	-	-	-	-	success	KEEP	sphere r=50mm with side-pinch pose; 50k cache filled in 22 min via incremental save
+031	2026-04-14	M3	xhand_sphere_ppo_default	4096	48000000	45	18000	-968	-1000	8.5	plateau	KEEP	plateau ~-1000 over 48M steps; lower penalty needed
+031b	2026-04-14	M3	xhand_sphere_ppo_lowpen	4096	48000000	45	18000	-968	-1040	8.5	plateau	KEEP	cut all penalties 1/10; reached -978 best, plateau ~-1040
+031c	2026-04-14	M3	xhand_sphere_ppo_bigreward	4096	16000000	14	18000	-996	-1066	8.5	plateau	KEEP	100x boost on object_pos_reward; no breakthrough; cache poses too unstable

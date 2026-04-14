@@ -1,6 +1,16 @@
 # M3: Port RL Recipe to RoboEra xhand (Simulation)
 
-**Status (2026-04-13 overnight)**: 🟥 **BLOCKED on grasp cache generation.** URDF→USD import, HandSpec refactor, VLM visual diagnostic pipeline, and synth-cache fallback all landed. Gravity-cycling grasp gen fails because xhand's 12-DOF flat-cup pose geometrically cannot wrap a cylinder (4 fingers form a near-flat y-wall with only ~27mm x-span, so no single cylindrical surface fits all fingers — see `memory/project_xhand_cage_limit.md`). Synth-cache-seeded PPO at 4096 envs, 3M steps, plateaued at mean reward **-3230** with no learning signal (vs SharpaWave's +19 at 2M). Cylinder drops immediately, no rotation reward. **Needs user input on next direction**; options listed in "M3 next steps" below.
+**Status (2026-04-14 overnight)**: 🟡 **Real grasp cache generated, PPO plateaued at ~-1000.** After ~30 pose iterations on cylinder, cracked the geometry: palm-up rot, side-pinch thumb (bend=1.5, rota1=0), root-curl-tip-flat fingers (j1=1.9, j2=0). Generated **50k cylinder cache** (EXP-028) and **50k sphere cache** (EXP-030b) using a new incremental save mode that bypasses the strict 400-consecutive-step requirement (sharpa_wave_grasp_env.py with `cfg.grasp_save_incremental=True`).
+
+PPO training results so far:
+- **Cylinder + default penalties**: -8500 (penalties drown signal)
+- **Cylinder + halved penalties**: -1727 (5x improvement, still flat)
+- **Sphere + reduced penalties**: -978 (best after 48M steps)
+- **Sphere + 100x boosted survival reward**: -996 (no breakthrough)
+
+PPO consistently converges to a "drop and reset" policy because the cached grasps are momentary contacts (not stable holds) → sphere/cylinder drops on first reset → episode terminates → small accumulated penalty per episode is the local minimum.
+
+**Needs user input on next direction.** Options below.
 
 **Goal**: Reproduce the M1/M2A results on the xhand (12 DOF) in Isaac Lab. Prove the SHARPA RL recipe (PPO + ProprioAdapt) is hand-agnostic at the algorithm level, and build a second in-sim baseline for cross-hand ablations (M2B/C/D) and real-hand deployment (M5).
 
@@ -165,19 +175,23 @@ Direct port once we have the asset. Same sequence as M3-B:
 - Documented porting guide (`docs/porting_new_hand.md` or in this roadmap)
 - xhand integration if URDF becomes available
 
-## M3 next steps (blocked — need decision)
+## M3 next steps (PPO plateau)
 
-The grasp cache blocker is geometric, not tunable. Options in increasing effort order:
+The grasp cache exists (cylinder + sphere variants), but PPO plateaus at ~-1000 because cached "grasps" are 1-step cond-true momentary contacts, not stable holds. The agent quickly learns "drop fast → minimize penalty" rather than "hold and rotate".
 
-1. **Reference dexscrew's xhand config** (<https://github.com/x-robotics-lab/dexscrew/tree/main/assets/xhand_left>). They may have a working grasp prior or a different object shape that suits xhand's kinematics. Cheapest path forward.
+Options in increasing effort order:
 
-2. **Change the object**: xhand was not designed to wrap a cylinder — its natural grasp is a cradle/pinch. Try a cube or sphere instead. SHARPA's published results are cylinder-specific, but a different object for xhand could still demonstrate the recipe's hand-agnosticism.
+1. **Filter cache for stability** — modify `grasp_save_incremental` to require N≥10 consecutive cond-true steps before saving. Current cache saves any momentary contact, including transient bounces. A stable-only cache (probably much smaller, say 5-10k entries) would seed PPO with real holds. **Cheapest, most likely to help.**
 
-3. **Different grasp style**: abandon wrap-grasp and use a "cylinder on palm + fingers close over" power grasp. Requires adding palm as a contact body and a differently-structured init pose. May also need reward shaping.
+2. **Curriculum learning** — start training with sphere kinematic_enabled (frozen in space), let PPO learn fingertip placement first, then unfreeze gravity. Removes the "drop on reset" failure mode.
 
-4. **Hand orientation rework**: rotate the hand so the palm faces up, letting gravity hold the cylinder in the cup. VLM iterations so far kept the default rot `(0.819, 0, -0.574, 0)` which points the palm sideways.
+3. **Add a per-step "alive" bonus** — modify `_get_rewards` in `sharpa_wave_env.py` to add `+1.0 * (object_z > reset_threshold)` per step. Currently the survival reward is `0.3 / (distance + 0.001)` which goes to ~0 quickly when the sphere drops. A binary alive bonus keeps the gradient even far from default.
 
-5. **Custom grasp-gen reward**: rewrite `SharpaWaveInhandRotateGraspEnv._get_rewards` so it accepts weaker (1- or 2-finger + palm) contact configurations that are feasible for xhand.
+4. **Remove `height_reset` early termination** — `_get_dones` ends episodes when sphere falls below `reset_height_lower`. With this, dropping is the local optimum (short episode = small penalty). Removing the early-reset forces PPO to live with full-length episodes, which may push it toward holding strategies.
+
+5. **Different object** — try a cube, or a spike/stick that nests in the palm differently. Not clear this would be easier.
+
+6. **Hardware-prior init pose** — user mentioned trying the actual xhand on cylinder — could record real human-teleop grasp pose and use as cache seed, bypassing the in-sim grasp-gen entirely.
 
 All five are user-facing decisions — will pause M3 until next session.
 
