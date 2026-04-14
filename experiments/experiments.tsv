@@ -37,3 +37,8 @@ id	date	milestone	description	num_envs	max_steps	duration_min	fps	best_reward	me
 031	2026-04-14	M3	xhand_sphere_ppo_default	4096	48000000	45	18000	-968	-1000	8.5	plateau	KEEP	plateau ~-1000 over 48M steps; lower penalty needed
 031b	2026-04-14	M3	xhand_sphere_ppo_lowpen	4096	48000000	45	18000	-968	-1040	8.5	plateau	KEEP	cut all penalties 1/10; reached -978 best, plateau ~-1040
 031c	2026-04-14	M3	xhand_sphere_ppo_bigreward	4096	16000000	14	18000	-996	-1066	8.5	plateau	KEEP	100x boost on object_pos_reward; no breakthrough; cache poses too unstable
+032	2026-04-14	M3	xhand_sphere_streak10	4096	-	30	-	-	-	-	fail	REVERT	streak=10 too strict; 0 cache entries in 30 min
+032b	2026-04-14	M3	xhand_sphere_streak3	4096	-	-	-	-	-	-	abort	-	switched to target=20k mid-run
+032c	2026-04-14	M3	xhand_sphere_streak3_20k	4096	-	195	-	-	-	-	success	KEEP	stable 20k cache, streak filter for ≥3 consecutive cond-true steps
+033	2026-04-14	M3	xhand_sphere_ppo_streak3	4096	10000000	9	18000	-1013	-1100	8.5	plateau	KEEP	streak filter alone didn't unlock learning; same -1000 plateau
+034	2026-04-14	M3	xhand_no_early_reset	4096	51000000	16	55000	0	-69000	8.5	fail	REVERT	disabled height_reset; agent can't recover from drops; -68k mean

@@ -1,14 +1,16 @@
 # M3: Port RL Recipe to RoboEra xhand (Simulation)
 
-**Status (2026-04-14 overnight)**: 🟡 **Real grasp cache generated, PPO plateaued at ~-1000.** After ~30 pose iterations on cylinder, cracked the geometry: palm-up rot, side-pinch thumb (bend=1.5, rota1=0), root-curl-tip-flat fingers (j1=1.9, j2=0). Generated **50k cylinder cache** (EXP-028) and **50k sphere cache** (EXP-030b) using a new incremental save mode that bypasses the strict 400-consecutive-step requirement (sharpa_wave_grasp_env.py with `cfg.grasp_save_incremental=True`).
+**Status (2026-04-14 overnight)**: 🟡 **Real grasp cache generated, PPO plateaued at ~-1000.** After ~30 pose iterations on cylinder, cracked the geometry: palm-up rot, side-pinch thumb (bend=1.5, rota1=0), root-curl-tip-flat fingers (j1=1.9, j2=0). Generated **50k cylinder cache** (EXP-028), **50k sphere cache** (EXP-030b), and **20k stable sphere cache** with streak≥3 filter (EXP-032c).
 
 PPO training results so far:
-- **Cylinder + default penalties**: -8500 (penalties drown signal)
-- **Cylinder + halved penalties**: -1727 (5x improvement, still flat)
-- **Sphere + reduced penalties**: -978 (best after 48M steps)
-- **Sphere + 100x boosted survival reward**: -996 (no breakthrough)
+- **Cylinder + default penalties (EXP-029)**: -8500 mean (penalties drown signal)
+- **Cylinder + halved penalties (EXP-029b)**: -1727 best (5x improvement, flat plateau)
+- **Sphere + reduced penalties (EXP-031b)**: -978 best after 48M steps
+- **Sphere + 100x survival reward (EXP-031c)**: -996 (no breakthrough)
+- **Sphere + streak≥3 cache (EXP-033)**: -1013 best (filter alone didn't help)
+- **Sphere + disable_height_reset (EXP-034)**: -68000 mean (made it worse — agent can't recover from drops, full episodes accumulate penalty)
 
-PPO consistently converges to a "drop and reset" policy because the cached grasps are momentary contacts (not stable holds) → sphere/cylinder drops on first reset → episode terminates → small accumulated penalty per episode is the local minimum.
+PPO consistently converges to a "drop fast → minimize penalty" local optimum. The cached grasps are momentary contacts (not stable holds) → sphere drops on reset → height_reset early-terminates → small accumulated penalty per episode is the local minimum. Removing early termination just makes the floor of penalty per episode much deeper without giving the agent a way out.
 
 **Needs user input on next direction.** Options below.
 
