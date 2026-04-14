@@ -34,6 +34,16 @@ class SharpaWaveInhandRotateEnv(DirectRLEnv):
 
         super().__init__(cfg, render_mode, **kwargs)
 
+        # Report curriculum config at startup so we can verify schedule wiring.
+        sched = getattr(cfg, 'gravity_schedule', None)
+        print(f"[env init] sim gravity cfg: {cfg.sim.gravity}", flush=True)
+        print(f"[env init] gravity_curriculum: {getattr(cfg, 'gravity_curriculum', None)}", flush=True)
+        print(f"[env init] gravity_schedule: {sched}", flush=True)
+        print(f"[env init] reward weights: rot={cfg.rotate_reward_scale} "
+              f"linvel={cfg.object_linvel_penalty_scale} pos_diff={cfg.pos_diff_penalty_scale} "
+              f"torque={cfg.torque_penalty_scale} work={cfg.work_penalty_scale} "
+              f"obj_pos={cfg.object_pos_reward_scale}", flush=True)
+
         self.num_hand_dofs = self.hand.num_joints
 
         self._axes_visualizer = None
@@ -251,6 +261,35 @@ class SharpaWaveInhandRotateEnv(DirectRLEnv):
             object_pos_diff, self.cfg.object_pos_reward_scale,
         )
 
+        # Opt-in contact reward (used by xhand curriculum). Rewards the
+        # number of fingertips with non-trivial contact force on the object.
+        contact_reward_scale = getattr(self.cfg, 'contact_reward_scale', 0.0)
+        if contact_reward_scale != 0.0:
+            num_sensors = len(self._contact_sensor)
+            force_matrix = torch.cat(
+                [self._contact_sensor[id].data.force_matrix_w[:, 0, 0, :].unsqueeze(1) for id in range(num_sensors)],
+                dim=1,
+            )
+            force_norms = torch.norm(force_matrix, dim=-1, p=2)  # [N, num_sensors]
+            # +1 per fingertip currently touching (force > 0.1N threshold).
+            num_touching = (force_norms > 0.1).sum(-1).float()
+            contact_reward = num_touching * contact_reward_scale
+            total_reward = total_reward + contact_reward
+            self.extras['contact_reward'] = contact_reward.mean()
+            self.extras['num_touching'] = num_touching.mean()
+
+        # Opt-in "alive" bonus: +K per step while the object is above a
+        # z threshold (i.e., still in the hand). This gives PPO a dense
+        # positive signal that doesn't require holding the object at its
+        # exact cache position — just not dropping it.
+        alive_bonus_scale = getattr(self.cfg, 'alive_bonus_scale', 0.0)
+        alive_bonus_threshold = getattr(self.cfg, 'alive_bonus_z_threshold', 0.0)
+        if alive_bonus_scale != 0.0:
+            alive = (self.object_pos[:, 2] > alive_bonus_threshold).float()
+            alive_bonus = alive * alive_bonus_scale
+            total_reward = total_reward + alive_bonus
+            self.extras['alive_bonus'] = alive_bonus.mean()
+
         self.extras["rotate_reward"] = rotate_reward.mean()
         self.extras["object_linvel_penalty"] = object_linvel_penalty.mean()
         self.extras["pos_diff_penalty"] = pos_diff_penalty.mean()
@@ -264,6 +303,28 @@ class SharpaWaveInhandRotateEnv(DirectRLEnv):
         self.extras['gravity_y'] = self.physics_sim_view.get_gravity()[1]
         self.extras['gravity_z'] = self.physics_sim_view.get_gravity()[2]
         self.extras['total_reward'] = total_reward.mean()
+
+        # Diagnostic: dump reward components every N env steps.
+        debug_every = getattr(self.cfg, 'reward_debug_every', 0)
+        if debug_every > 0 and self.common_step_counter % debug_every == 0:
+            comps = {
+                "total": total_reward.mean().item(),
+                "rot": (rotate_reward * self.cfg.rotate_reward_scale).mean().item(),
+                "linvel_pen": (object_linvel_penalty * self.cfg.object_linvel_penalty_scale).mean().item(),
+                "pos_diff_pen": (pos_diff_penalty * self.cfg.pos_diff_penalty_scale).mean().item(),
+                "torque_pen": (torque_penalty * self.cfg.torque_penalty_scale).mean().item(),
+                "work_pen": (work_penalty * self.cfg.work_penalty_scale).mean().item(),
+                "obj_pos_rew": (object_pos_diff * self.cfg.object_pos_reward_scale).mean().item(),
+            }
+            if contact_reward_scale != 0.0:
+                comps["contact_rew"] = contact_reward.mean().item()
+                comps["n_touch"] = num_touching.mean().item()
+            if alive_bonus_scale != 0.0:
+                comps["alive_rew"] = alive_bonus.mean().item()
+                comps["alive_frac"] = alive.mean().item()
+            comps["obj_z"] = self.object_pos[:, 2].mean().item()
+            comps["ep_len"] = self.episode_length_buf.float().mean().item()
+            print(f"[reward step={self.common_step_counter}] " + " ".join(f"{k}={v:.3f}" for k, v in comps.items()), flush=True)
         return total_reward
 
     def _get_dones(self) -> tuple[torch.Tensor, torch.Tensor]:
@@ -300,11 +361,10 @@ class SharpaWaveInhandRotateEnv(DirectRLEnv):
             step = self.common_step_counter
             g_z = _interp_schedule(step, schedule)
             cur = self.physics_sim_view.get_gravity()
-            # Only update if changed by > 0.01 to avoid per-step API calls.
             if abs(cur[2] - g_z) > 0.01:
                 self.physics_sim_view.set_gravity(carb.Float3(0.0, 0.0, g_z))
-                if self.common_step_counter % 200 == 0:
-                    print(f"[gravity schedule] step={step} gravity_z={g_z:.3f}", flush=True)
+            if step % 200 == 0:
+                print(f"[gravity schedule] step={step} target_z={g_z:.4f} actual_z={cur[2]:.4f}", flush=True)
         return height_reset, time_out
 
     def _rand_pd_scales(self, lower, upper, num_envs, n_dofs):

@@ -211,8 +211,13 @@ class XhandEnvCfg(SharpaWaveEnvCfg):
         init_state=RigidObjectCfg.InitialStateCfg(pos=(-0.075, 0.0, 0.620), rot=(1.0, 0.0, 0.0, 0.0)),
     )
 
-    reset_height_lower = 0.6
-    reset_height_upper = 0.64
+    # Widened from (0.6, 0.64) to give episodes room to run. Per-env bounds
+    # are set as (obj_default_z - window/2, obj_default_z + window/2) in
+    # _reset_idx, so what matters is the delta: 0.4 gives a ±0.2m window.
+    # Alive bonus tells PPO when the sphere is "safe" via the z threshold
+    # separately — we don't need height_reset to be tight too.
+    reset_height_lower = 0.2
+    reset_height_upper = 0.6
 
     # High friction matching grasp gen.
     metal_base_friction = 5.0
@@ -230,12 +235,27 @@ class XhandEnvCfg(SharpaWaveEnvCfg):
     # As the agent learns to hold in the first few million steps, the
     # gravity schedule below will ramp up the difficulty and the policy
     # can transfer what it learned to rotate under real gravity.
+    # EXP-M3A-7 diagnostic showed work_penalty raw ≈ 6000 per step, so even
+    # -0.02 weight produces -120/step, DOMINATING the total. Optimal policy
+    # becomes "minimize torque" which means "don't hold the sphere". Zero
+    # them during curriculum; add back in final stage only.
     object_linvel_penalty_scale = -0.02
     pos_diff_penalty_scale = -0.02
-    torque_penalty_scale = -0.005
-    work_penalty_scale = -0.02
-    object_pos_reward_scale = 0.5  # alive/hold signal dominates early
-    rotate_reward_scale = 1.0  # half of SharpaWave default (2.5) — don't chase rotation too hard
+    torque_penalty_scale = 0.0
+    work_penalty_scale = 0.0
+    object_pos_reward_scale = 0.1  # proximity-to-cache reward — small
+    rotate_reward_scale = 1.0  # half of SharpaWave default (2.5)
+    # Contact reward: +2 per fingertip touching the sphere (force > 0.1N).
+    contact_reward_scale = 2.0
+    # Alive bonus: +5 per step while sphere z > 0.55 (above the palm).
+    # Sphere cache positions are z ~ 0.60-0.65 and palm is at z ~ 0.5, so
+    # 0.55 catches "sphere has dropped off the hand" without false-firing
+    # from small positional drift.
+    alive_bonus_scale = 5.0
+    alive_bonus_z_threshold = 0.55
+
+    # Print reward components every 200 env steps for diagnosis.
+    reward_debug_every = 200
 
     # --- Step-scheduled gravity curriculum ---
     # Interpolate world gravity z linearly between keypoints on the env's
@@ -243,16 +263,18 @@ class XhandEnvCfg(SharpaWaveEnvCfg):
     # env reads this in sharpa_wave_env._get_dones and calls set_gravity().
     #
     # For 4096 envs and PPO horizon=8, common_step_counter ≈ agent_steps / 4096.
-    # Schedule units below are env steps (common_step_counter):
-    #   0–2000 steps:     g=0 (pure hold phase, ~8M agent steps)
-    #   2000–10000 steps: g ramps linearly to -9.81 (~33M more agent steps)
-    #   10000+ steps:     full gravity
-    # Total ~40M agent steps to reach full gravity.
+    # EXP-M3A-2b showed the ramp from step 2000 to 10000 was WAY too fast —
+    # reward degraded from -380 at step 2000 (g=0) to -609 at step 4800 (g=-3.4)
+    # because PPO couldn't adapt quickly enough. Slowed 5x.
+    # Schedule:
+    #   0–3000 steps:     g=0 (pure hold phase, ~12M agent steps to converge)
+    #   3000–50000 steps: g ramps linearly to -9.81 over ~190M agent steps
+    #   50000+ steps:     full gravity, standard task
     gravity_curriculum = False  # disable the reset-rate-gated SharpaWave curriculum
     gravity_schedule = [
         (0,      0.0),
-        (2_000,  0.0),
-        (10_000, -9.81),
+        (3_000,  0.0),
+        (50_000, -9.81),
     ]
 
     # --- override grasp cache path for xhand ---
