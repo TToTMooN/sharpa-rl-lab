@@ -174,14 +174,14 @@ class XhandGraspEnvCfg(SharpaWaveGraspEnvCfg):
     # the cache, not loading it. grasp_cache_save_prefix controls where it's written.
     grasp_cache_save_prefix = "cache/xhand_grasp_linspace"
 
-    # Override cylinder spawn position to match the verified TRAINABLE pose.
+    # SPHERE object instead of cylinder. Cylinder rotation is too constrained
+    # for xhand's flat finger arrangement (intermittent contacts won't sustain
+    # the rotation axis). A sphere is symmetric so any rotation reward applies,
+    # and a sphere settles naturally into the finger cup under gravity.
     object_cfg: RigidObjectCfg = RigidObjectCfg(
         prim_path="/World/envs/env_.*/object",
-        spawn=sim_utils.UsdFileCfg(
-            usd_path=os.path.join(
-                os.path.dirname(os.path.abspath(__file__)),
-                "../../../assets/cylinder/cylinder.usd",
-            ),
+        spawn=sim_utils.SphereCfg(
+            radius=0.05,
             rigid_props=sim_utils.RigidBodyPropertiesCfg(
                 kinematic_enabled=False,
                 disable_gravity=False,
@@ -198,12 +198,11 @@ class XhandGraspEnvCfg(SharpaWaveGraspEnvCfg):
                 rest_offset=0.0,
             ),
             mass_props=sim_utils.MassPropertiesCfg(mass=0.05),
-            scale=(1., 1., 1.),
+            visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.85, 0.15, 0.15), metallic=0.1),
         ),
-        # Cylinder closer to fingers (x=-0.085) — bigger overlap with index/
-        # mid/ring at x=-0.105, so contact forces are sustained.
+        # Sphere (radius 0.035) at the cup center, just above 4-finger cluster.
         init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(-0.085, 0.0, 0.605),
+            pos=(-0.075, 0.0, 0.620),
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
     )
@@ -224,7 +223,10 @@ class XhandGraspEnvCfg(SharpaWaveGraspEnvCfg):
     randomize_friction_scale_lower = 1.0
     randomize_friction_scale_upper = 1.0
 
+    # Sphere — single radius, scale_range still required by code.
     scale_range = [1.0, 1.0, 1]
+    # Output cache to a different path so we don't clobber the cylinder cache.
+    grasp_cache_save_prefix = "cache/xhand_sphere_grasp_linspace"
 
     # Relaxed contact requirements for xhand (flat cup can't reach 3 simultaneous
     # side contacts; accept 2 fingers + weaker 0.2N threshold).
