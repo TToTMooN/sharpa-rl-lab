@@ -271,6 +271,12 @@ class SharpaWaveInhandRotateEnv(DirectRLEnv):
         height_reset_upper = self.object_pos[:, 2] > self.reset_height_upper
         height_reset_lower = self.object_pos[:, 2] < self.reset_height_lower
         height_reset = height_reset_upper | height_reset_lower
+        # Opt-in: skip early termination on height reset so the agent can't
+        # short-circuit penalty by dropping fast. Used for xhand where the
+        # cached grasps are unstable and the agent must learn to hold over
+        # long episodes.
+        if getattr(self.cfg, 'disable_height_reset', False):
+            height_reset = torch.zeros_like(height_reset)
         time_out = self.episode_length_buf >= self.max_episode_length - 1
         self.extras['height_reset_upper'] = height_reset_upper.float().mean()
         self.extras['height_reset_lower'] = height_reset_lower.float().mean()
