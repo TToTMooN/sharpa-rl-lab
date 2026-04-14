@@ -34,6 +34,8 @@ class SharpaWaveInhandRotateGraspEnv(SharpaWaveInhandRotateEnv):
             carb.Float3(9.81, 0.0, 0.0),
             carb.Float3(-9.81, 0.0, 0.0),
         ]
+        # Per-env consecutive cond-true counter for incremental cache filtering.
+        self.cond_streak = torch.zeros(self.num_envs, dtype=torch.long, device=self.device)
 
     def _get_rewards(self) -> torch.Tensor:
         # Per-fingertip distance to object center
@@ -52,25 +54,29 @@ class SharpaWaveInhandRotateGraspEnv(SharpaWaveInhandRotateEnv):
         cond = cond1.float() * cond2.float() * cond3.float()
         self.reset_buf[cond < 1] = 1
 
-        # Incremental cache save: any env where cond is true RIGHT NOW gets its
-        # state saved to the cache (before reset). This sidesteps the strict
-        # "must survive 400 consecutive steps" requirement that xhand can't meet
-        # because its grasps are intermittent under gravity cycling. Off by
-        # default; opt in via cfg.grasp_save_incremental.
+        # Incremental cache save: track consecutive cond-true steps per env;
+        # save state when streak reaches grasp_save_streak_threshold (default 1).
+        # Higher threshold = more stable grasps in cache but slower fill.
         if getattr(self.cfg, 'grasp_save_incremental', False):
-            success_now = cond > 0
+            cond_bool = cond > 0
+            self.cond_streak = torch.where(cond_bool, self.cond_streak + 1, torch.zeros_like(self.cond_streak))
+            streak_threshold = getattr(self.cfg, 'grasp_save_streak_threshold', 1)
+            success_now = self.cond_streak >= streak_threshold
             if success_now.any():
                 states = torch.cat([self.hand_dof_pos, self.object_pos, self.object_rot], dim=1)[success_now]
                 saved_scale_ids = self.scale_ids[success_now]
-                target_per_scale = 5e4 // self.cfg.scale_range[2]
+                target_per_scale = getattr(self.cfg, 'grasp_target_size', 5e4) // self.cfg.scale_range[2]
                 for id, sid in enumerate(saved_scale_ids):
                     if self.saved_grasping_states[sid].shape[0] < target_per_scale:
                         self.saved_grasping_states[sid] = torch.cat(
                             [self.saved_grasping_states[sid], states[id].reshape(-1, self.pose_cache_dim)], dim=0
                         )
+                # Don't double-save the same env: reset its streak after saving.
+                self.cond_streak[success_now] = 0
+                target_per_scale_int = int(target_per_scale)
                 if self.common_step_counter % 200 == 0:
                     sum_total = sum(s.shape[0] for s in self.saved_grasping_states)
-                    finish_scale = sum(1 for s in self.saved_grasping_states if s.shape[0] >= target_per_scale)
+                    finish_scale = sum(1 for s in self.saved_grasping_states if s.shape[0] >= target_per_scale_int)
                     print(f'[INCREMENTAL] cache size: {sum_total}, finished scales: {finish_scale}/{self.cfg.scale_range[2]}', flush=True)
                     if finish_scale == self.cfg.scale_range[2]:
                         print('done! (incremental)', flush=True)

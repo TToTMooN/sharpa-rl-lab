@@ -234,7 +234,10 @@ class XhandGraspEnvCfg(SharpaWaveGraspEnvCfg):
     grasp_force_thresh = 0.2
     # Incremental save mode: xhand's intermittent grasps can't survive 400-step
     # gravity cycling, so save any momentary cond-true state instead of waiting
-    # for full episode end.
+    # for full episode end. Streak threshold filters for "held for N consecutive
+    # steps" — higher = more stable grasps in cache (and smaller cache).
     grasp_save_incremental = True
+    grasp_save_streak_threshold = 3
+    grasp_target_size = 20000
     events: EventCfg = EventCfg()
     events.rand_params(scale_range)
