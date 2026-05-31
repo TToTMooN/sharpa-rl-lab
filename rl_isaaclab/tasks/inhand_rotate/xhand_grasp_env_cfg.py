@@ -13,6 +13,7 @@ from isaaclab.sensors import ContactSensorCfg
 from isaaclab.utils import configclass
 
 from .sharpa_wave_grasp_env_cfg import SharpaWaveEnvCfg as SharpaWaveGraspEnvCfg, EventCfg
+from .palm_pose import palm_quat
 
 
 @configclass
@@ -36,12 +37,13 @@ class XhandGraspEnvCfg(SharpaWaveGraspEnvCfg):
     elastomer_material_ids: list[int] = []
 
     # --- hand init pose ---
-    # Palm-UP rotation (was (0.819, 0, -0.574, 0) = -70° about y, gave palm
-    # sideways). -90° about y = (0.7071, 0, -0.7071, 0) gives palm facing +z
-    # world with fingers pointing +x and curling -z (toward palm center) on
-    # flexion — natural cup for a vertical cylinder held between thumb and
-    # 4 opposing fingers.
-    hand_init_pose = ((0.0, 0.0, 0.5), (0.7071068, 0.0, -0.7071068, 0.0))
+    # Palm orientation as sweepable XYZ-Euler degrees. (0, -90, 0) reproduces
+    # the legacy flat palm-up pose (palm faces +z, fingers point +x, curl up).
+    # The grasp cache is generated AT this orientation, so it MUST match
+    # xhand_env_cfg.palm_euler_deg or the cached holds won't transfer to
+    # training. See palm_pose.py / roadmap/M3B_angled_palm.md.
+    palm_euler_deg = (0.0, -90.0, 0.0)
+    hand_init_pose = ((0.0, 0.0, 0.5), palm_quat(*palm_euler_deg))
 
     robot_cfg: ArticulationCfg = ArticulationCfg(
         prim_path="/World/envs/env_.*/Robot",

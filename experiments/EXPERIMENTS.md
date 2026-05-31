@@ -247,3 +247,16 @@ M2 ablation work should investigate the distillation hyperparameters and loss fo
 
 ### M2 Phase A conclusion
 **Distillation gap CLOSED in single experiment** (EXP-012+013+014). The remaining M2 Phase B/C/D ablations are now optional — the main problem is solved. Moving to M3 (generalization) is justified.
+
+---
+
+## EXP-M3B-1: Does the xhand grasp actually grip? (laptop, 2026-05-31)
+**Hypothesis**: M3A's +54 is a real (if weak) grasp; an angled palm should strengthen it into rotation.
+**Change**: New laptop env (RTX 5090 Laptop). Parameterized palm orientation as `palm_euler_deg` (`palm_pose.py`). Built camera-free diagnostics (`palm_probe.py`, `cache_hold_check.py`) because rendering segfaults here (RTX renderer / `create_new_stage`, known RTX 5090 issue) — the VLM visual loop is unavailable.
+**Run**: headless training smoke (reproduced +120 @ g=0); palm-tilt × tip-curl sweeps; full-gravity replay of 256 cache configs.
+**Result**:
+- Faithful env signal: at the cache pose, `n_touch=0.000` even at g=0 — **fingertips never grip the sphere**; the cache encodes proximity, not grip (criteria too lax: ≥2 tips at >0.2 N vs the sphere's 0.49 N weight).
+- M3A-8 reinterpreted: trained policy actively balances the sphere ~81% of steps at full gravity (`alive_frac` 0.92→0.81) with ~0 rotation — a wobbly active hold, not force closure.
+- Palm tilt alone does not create grip (the corner needs the fingertips to close, which they don't).
+**Decision**: KEEP tooling + parameterization. The xhand wall is a grasp/geometry problem, and it can't be tuned blind (no rendering on this laptop).
+**Next**: pick an unblock — (A) real-hand prior: capture a human-found grip from the physical xhand via the SDK and seed the cache (`synth_xhand_cache.py`); (B) fix rendering and run the visual pose loop; or (C) switch to an open-palm "object resting on palm" task that matches xhand's morphology. See `roadmap/M3B_angled_palm.md`.

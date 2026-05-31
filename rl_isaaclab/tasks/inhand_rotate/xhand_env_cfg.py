@@ -23,6 +23,7 @@ from isaaclab.sim import PhysxCfg, SimulationCfg
 from isaaclab.utils import configclass
 
 from .sharpa_wave_env_cfg import SharpaWaveEnvCfg, EventCfg
+from .palm_pose import palm_quat
 
 
 @configclass
@@ -53,9 +54,18 @@ class XhandEnvCfg(SharpaWaveEnvCfg):
     elastomer_material_ids: list[int] = []
 
     # --- hand pose (in world frame when spawned) ---
-    # Palm-UP orientation: -90° about y axis. Fingers extend horizontally,
-    # flexion curls them up into a cup. Matches grasp_env_cfg rotation.
-    hand_init_pose = ((0.0, 0.0, 0.5), (0.7071068, 0.0, -0.7071068, 0.0))
+    # Palm orientation expressed as sweepable XYZ-Euler degrees (roll, pitch,
+    # yaw). (0, -90, 0) reproduces the legacy FLAT palm-up pose exactly: palm
+    # faces +z, fingers point +x and curl up into a ring.
+    #
+    # The flat palm is a weak cradle — the object only rests on a ring of
+    # fingertips and rolls out through the thumb-opposite gap under gravity.
+    # A non-flat (angled) palm tilts the hand so the object settles into the
+    # corner between palm and curled fingers and gravity presses it INTO that
+    # wall. Tune via the VLM loop (visual_check.py); see
+    # roadmap/M3B_angled_palm.md. MUST match xhand_grasp_env_cfg.palm_euler_deg.
+    palm_euler_deg = (0.0, -90.0, 0.0)
+    hand_init_pose = ((0.0, 0.0, 0.5), palm_quat(*palm_euler_deg))
 
 
     # --- robot articulation ---
