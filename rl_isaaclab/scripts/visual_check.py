@@ -29,6 +29,10 @@ parser.add_argument("--camera_pos", type=float, nargs=3, default=[0.35, 0.35, 0.
 parser.add_argument("--camera_target", type=float, nargs=3, default=[0.0, 0.0, 0.55])
 parser.add_argument("--resolution", type=int, nargs=2, default=[1024, 1024])
 parser.add_argument("--obj_scale", type=float, default=0.5, help="Cylinder scale.")
+parser.add_argument("--obj_shape", choices=["cylinder", "sphere"], default="cylinder",
+                    help="Object shape to spawn (sphere matches the xhand training env).")
+parser.add_argument("--sphere_radius", type=float, default=0.05,
+                    help="Sphere radius (matches xhand env; not affected by --obj_scale).")
 parser.add_argument("--prompt", type=str, default=None,
                     help="Override the Gemini prompt.")
 parser.add_argument("--hand_pos", type=float, nargs=3, default=None,
@@ -265,9 +269,20 @@ def main():
     # multiplies these.
     base_radius = 0.04 * args_cli.obj_scale
     base_height = 0.064 * args_cli.obj_scale
-    obj_cfg = RigidObjectCfg(
-        prim_path="/World/Cylinder",
-        spawn=sim_utils.CylinderCfg(
+    if args_cli.obj_shape == "sphere":
+        # Matches xhand training env: sphere radius 0.05, mass 0.05 (no obj_scale).
+        spawn_cfg = sim_utils.SphereCfg(
+            radius=args_cli.sphere_radius,
+            rigid_props=sim_utils.RigidBodyPropertiesCfg(
+                disable_gravity=False,
+                enable_gyroscopic_forces=True,
+            ),
+            mass_props=sim_utils.MassPropertiesCfg(mass=0.05),
+            collision_props=sim_utils.CollisionPropertiesCfg(collision_enabled=True),
+            visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.85, 0.15, 0.15), metallic=0.1),
+        )
+    else:
+        spawn_cfg = sim_utils.CylinderCfg(
             radius=base_radius,
             height=base_height,
             rigid_props=sim_utils.RigidBodyPropertiesCfg(
@@ -277,7 +292,10 @@ def main():
             mass_props=sim_utils.MassPropertiesCfg(mass=0.05),
             collision_props=sim_utils.CollisionPropertiesCfg(collision_enabled=True),
             visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.85, 0.15, 0.15), metallic=0.1),
-        ),
+        )
+    obj_cfg = RigidObjectCfg(
+        prim_path="/World/Cylinder",
+        spawn=spawn_cfg,
         init_state=RigidObjectCfg.InitialStateCfg(pos=CYL_INIT_POS, rot=CYL_INIT_ROT),
     )
     obj = RigidObject(obj_cfg)
