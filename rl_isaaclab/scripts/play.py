@@ -20,6 +20,7 @@ parser.add_argument("--load_path", type=str, default=None, help="Checkpoint path
 parser.add_argument("--max_agent_steps", type=int, default=None, help="RL Policy training iterations.")
 parser.add_argument("--algorithm", type=str, default=None, help="Run training with multiple GPUs or nodes.")
 parser.add_argument("--resume", action="store_true", default=False, help="Resume training from checkpoint.")
+parser.add_argument("--zero_action", action="store_true", default=False, help="Run the env with zero actions and no checkpoint (env sanity check / visualize the hand).")
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
 args_cli, hydra_args = parser.parse_known_args()
@@ -99,6 +100,21 @@ def main(env_cfg: DirectRLEnvCfg, agent_cfg: dict):
     # create isaac environment
     env = gym.make(args_cli.task, cfg=env_cfg, render_mode=None)
     env = GymStyleEnvWrapper(env, clip_actions=env_cfg.clip_actions)
+
+    # zero-action sanity check: no checkpoint, no agent, just step the env with zeros
+    if args_cli.zero_action:
+        obs_dict = env.reset()
+        actions = torch.zeros((env.num_envs, env.num_actions), device=env.device)
+        max_steps = args_cli.max_agent_steps if args_cli.max_agent_steps is not None else 2000
+        step = 0
+        while simulation_app.is_running() and step < max_steps:
+            obs_dict, r, done, info = env.step(actions)
+            if step % 100 == 0:
+                print(f"[zero_action] step {step} | mean_reward {r.mean().item():.4f} | done_envs {int(done.sum().item())}")
+            step += 1
+        env.close()
+        return
+
     agent = eval(agent_cfg["algo"])(env, output_dir=log_dir, full_config=config, create_output_dir=False)
     
     # load the checkpoint
