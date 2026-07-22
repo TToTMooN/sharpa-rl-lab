@@ -66,6 +66,18 @@ def main(env_cfg: DirectRLEnvCfg, agent_cfg: dict):
     agent_cfg["device"] = args_cli.device if args_cli.device is not None else agent_cfg["device"]
     agent_cfg["algo"] = args_cli.algorithm if args_cli.algorithm is not None else agent_cfg["algo"]
     agent_cfg["load_path"] = args_cli.load_path if args_cli.load_path is not None else agent_cfg["load_path"]
+    # Size the model's priv_info branch to match the checkpoint, so any checkpoint loads
+    # without a manual override. Shipped/pretrained checkpoints were trained with
+    # priv_info_dim=8; the scale-aware env uses 9. priv_info is unused at inference, so we
+    # only need env_mlp's shape to match for load_state_dict; the env keeps its own dim.
+    if agent_cfg["load_path"] and str(agent_cfg["load_path"]) != "None":
+        ckpt_sd = torch.load(agent_cfg["load_path"], map_location="cpu", weights_only=False)
+        ckpt_sd = ckpt_sd.get("model", ckpt_sd)
+        ckpt_env_mlp_w = ckpt_sd.get("env_mlp.mlp.0.weight")
+        if ckpt_env_mlp_w is not None and ckpt_env_mlp_w.shape[1] != agent_cfg["algorithm"]["priv_info_dim"]:
+            print(f"[INFO]: Matching model priv_info_dim {agent_cfg['algorithm']['priv_info_dim']} "
+                  f"-> {ckpt_env_mlp_w.shape[1]} to checkpoint")
+            agent_cfg["algorithm"]["priv_info_dim"] = ckpt_env_mlp_w.shape[1]
     env_cfg.reset_random_quat = False
     env_cfg.randomize_pd_gains = False
     env_cfg.randomize_friction = True
