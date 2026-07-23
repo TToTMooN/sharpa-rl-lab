@@ -64,7 +64,9 @@ class XhandEnvCfg(SharpaWaveEnvCfg):
     # corner between palm and curled fingers and gravity presses it INTO that
     # wall. Tune via the VLM loop (visual_check.py); see
     # roadmap/M3B_angled_palm.md. MUST match xhand_grasp_env_cfg.palm_euler_deg.
-    palm_euler_deg = (0.0, -90.0, 0.0)
+    # (5, -90, 0) is the Q4 nest pose found by the 8-round visual search:
+    # slight roll tips the sphere into the thumb-side bowl.
+    palm_euler_deg = (5.0, -90.0, 0.0)
     hand_init_pose = ((0.0, 0.0, 0.5), palm_quat(*palm_euler_deg))
 
 
@@ -101,21 +103,22 @@ class XhandEnvCfg(SharpaWaveEnvCfg):
         init_state=ArticulationCfg.InitialStateCfg(
             pos=hand_init_pose[0],
             rot=hand_init_pose[1],
-            # Side-pinch root-curl-tip-flat pose. Real grasp cache generated
-            # by EXP-028 (cache/xhand_grasp_linspace_1.0-1.0-1.npy, 50k entries).
+            # Q4 nest pose: moderate root curl (j1=0.5) + strong tip curl
+            # (j2=0.9) forms a palm bowl; thumb wraps over the sphere. Holds
+            # the r=0.04 sphere statically under full gravity for 900+ steps.
             joint_pos={
-                "right_hand_thumb_bend_joint": 1.5,
-                "right_hand_thumb_rota_joint1": 0.0,
-                "right_hand_thumb_rota_joint2": 0.5,
+                "right_hand_thumb_bend_joint": 1.2,
+                "right_hand_thumb_rota_joint1": 1.4,
+                "right_hand_thumb_rota_joint2": 0.8,
                 "right_hand_index_bend_joint": 0.0,
-                "right_hand_index_joint1": 1.9,
-                "right_hand_index_joint2": 0.0,
-                "right_hand_mid_joint1": 1.9,
-                "right_hand_mid_joint2": 0.0,
-                "right_hand_ring_joint1": 1.9,
-                "right_hand_ring_joint2": 0.0,
-                "right_hand_pinky_joint1": 1.9,
-                "right_hand_pinky_joint2": 0.0,
+                "right_hand_index_joint1": 0.5,
+                "right_hand_index_joint2": 0.9,
+                "right_hand_mid_joint1": 0.5,
+                "right_hand_mid_joint2": 0.9,
+                "right_hand_ring_joint1": 0.5,
+                "right_hand_ring_joint2": 0.9,
+                "right_hand_pinky_joint1": 0.5,
+                "right_hand_pinky_joint2": 0.9,
             },
         ),
         actuators={
@@ -193,13 +196,15 @@ class XhandEnvCfg(SharpaWaveEnvCfg):
         "right_hand_pinky_tip",
     ]
 
-    # SPHERE object (radius 50mm) — switched from cylinder because xhand's
+    # SPHERE object (radius 40mm) — switched from cylinder because xhand's
     # flat finger arrangement can't form a stable wrap grasp on a cylinder.
-    # Sphere is symmetric in all directions and settles into the cup.
+    # Sphere is symmetric in all directions. Radius reduced from 50mm so the
+    # ball nests in the Q4 palm bowl; at 50mm it perched on the hand with no
+    # cavity.
     object_cfg: RigidObjectCfg = RigidObjectCfg(
         prim_path="/World/envs/env_.*/object",
         spawn=sim_utils.SphereCfg(
-            radius=0.05,
+            radius=0.04,
             rigid_props=sim_utils.RigidBodyPropertiesCfg(
                 kinematic_enabled=False,
                 disable_gravity=False,
@@ -218,7 +223,7 @@ class XhandEnvCfg(SharpaWaveEnvCfg):
             mass_props=sim_utils.MassPropertiesCfg(mass=0.05),
             visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.85, 0.15, 0.15), metallic=0.1),
         ),
-        init_state=RigidObjectCfg.InitialStateCfg(pos=(-0.075, 0.0, 0.620), rot=(1.0, 0.0, 0.0, 0.0)),
+        init_state=RigidObjectCfg.InitialStateCfg(pos=(-0.128, -0.014, 0.558), rot=(1.0, 0.0, 0.0, 0.0)),
     )
 
     # Widened from (0.6, 0.64) to give episodes room to run. Per-env bounds
@@ -257,12 +262,12 @@ class XhandEnvCfg(SharpaWaveEnvCfg):
     rotate_reward_scale = 1.0  # half of SharpaWave default (2.5)
     # Contact reward: +2 per fingertip touching the sphere (force > 0.1N).
     contact_reward_scale = 2.0
-    # Alive bonus: +5 per step while sphere z > 0.55 (above the palm).
-    # Sphere cache positions are z ~ 0.60-0.65 and palm is at z ~ 0.5, so
-    # 0.55 catches "sphere has dropped off the hand" without false-firing
-    # from small positional drift.
+    # Alive bonus: +5 per step while sphere z > 0.52 (above the palm).
+    # The Q4 nest equilibrium is z = 0.558, so 0.55 left only 8mm margin;
+    # 0.52 still catches "sphere has dropped off the hand" (palm is at
+    # z ~ 0.5) without false-firing from small positional drift.
     alive_bonus_scale = 5.0
-    alive_bonus_z_threshold = 0.55
+    alive_bonus_z_threshold = 0.52
 
     # Print reward components every 200 env steps for diagnosis.
     reward_debug_every = 200

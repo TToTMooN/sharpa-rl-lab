@@ -13,7 +13,7 @@ Cache row layout matches sharpa_wave_env.py loader: [D hand DOFs | 3 obj_pos | 4
 Usage:
   pixi run python rl_isaaclab/scripts/synth_xhand_cache.py
 
-Output: cache/xhand_grasp_linspace_1.0-1.0-1.npy
+Output: cache/xhand_sphere_grasp_linspace_1.0-1.0-1.npy
 """
 
 from __future__ import annotations
@@ -34,19 +34,22 @@ import numpy as np
 #  [ 9] right_hand_thumb_rota_joint1
 #  [10] right_hand_index_joint2
 #  [11] right_hand_thumb_rota_joint2
+# Q4 nest pose (palm_euler_deg=(5,-90,0)): moderate root curl + strong tip
+# curl forms a palm bowl, thumb wraps over. Statically holds the r=0.04
+# sphere under full gravity for 900+ steps.
 JOINT_VALUES = [
     0.0,   # index_bend
-    0.95,  # mid_joint1
-    0.95,  # pinky_joint1
-    0.95,  # ring_joint1
-    1.8,   # thumb_bend
-    0.95,  # index_joint1
-    1.1,   # mid_joint2
-    1.1,   # pinky_joint2
-    1.1,   # ring_joint2
-    1.5,   # thumb_rota1
-    1.1,   # index_joint2
-    1.0,   # thumb_rota2
+    0.5,   # mid_joint1
+    0.5,   # pinky_joint1
+    0.5,   # ring_joint1
+    1.2,   # thumb_bend
+    0.5,   # index_joint1
+    0.9,   # mid_joint2
+    0.9,   # pinky_joint2
+    0.9,   # ring_joint2
+    1.4,   # thumb_rota1
+    0.9,   # index_joint2
+    0.8,   # thumb_rota2
 ]
 
 # Joint limits (lower, upper) from URDF
@@ -65,14 +68,17 @@ JOINT_LIMITS = [
     (0.0, 1.5700),       # thumb_rota2
 ]
 
-OBJ_POS = [-0.06, 0.0, 0.585]
+# Settled Q4 nest position (world frame, hand root at (0, 0, 0.5)).
+OBJ_POS = [-0.128, -0.014, 0.558]
 OBJ_QUAT = [1.0, 0.0, 0.0, 0.0]
 
 NUM_ENTRIES = 50_000
 JOINT_NOISE = 0.05
 POS_NOISE = 0.005
 
-OUTPUT_PATH = "cache/xhand_grasp_linspace_1.0-1.0-1.npy"
+# Must match the training env's grasp_cache_path ("cache/xhand_sphere_grasp_linspace",
+# xhand_env_cfg.py) + the "_1.0-1.0-1.npy" suffix appended by sharpa_wave_env.py.
+OUTPUT_PATH = "cache/xhand_sphere_grasp_linspace_1.0-1.0-1.npy"
 
 
 def main():

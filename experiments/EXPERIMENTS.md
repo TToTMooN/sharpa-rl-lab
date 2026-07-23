@@ -260,3 +260,36 @@ M2 ablation work should investigate the distillation hyperparameters and loss fo
 - Palm tilt alone does not create grip (the corner needs the fingertips to close, which they don't).
 **Decision**: KEEP tooling + parameterization. The xhand wall is a grasp/geometry problem, and it can't be tuned blind (no rendering on this laptop).
 **Next**: pick an unblock — (A) real-hand prior: capture a human-found grip from the physical xhand via the SDK and seed the cache (`synth_xhand_cache.py`); (B) fix rendering and run the visual pose loop; or (C) switch to an open-palm "object resting on palm" task that matches xhand's morphology. See `roadmap/M3B_angled_palm.md`.
+
+---
+
+## EXP-M3B-2: Visual pose search finds a gravity-stable xhand hold (laptop, 2026-07-23)
+**Hypothesis**: With rendering fixed (driver 580 — unblock B from EXP-M3B-1), an image-in-the-loop
+search over palm tilt x joint pose x object size can find a pose where the sphere is statically
+retained under full gravity — the missing precondition for rotation training.
+**Change**: `visual_check.py` gained `--obj_shape sphere --sphere_radius` (the env trains a sphere
+but the tool only had a cylinder). No env changes during the search itself.
+**Run**: 8 sweep rounds, ~35 renders (each: place/drop sphere, 300-900 gravity steps @1/240s,
+screenshot + settled-position telemetry). Escape-route elimination:
+| Round | Tried | Escape | Lesson |
+|---|---|---|---|
+| 1 | pitch -45..-70 (tilt toward thumb) | +x | wrong tilt direction |
+| 1b | pitch -105..-120 (toward fingers) | ±y | roll steers the leak side; no wall anywhere |
+| 2 | + hard closure (thumb 1.7-1.8, fingers 1.15-1.3) | all | closure = fist; 10cm ball perches on knuckles, no cavity |
+| 3 | palm-side camera + gentle placement | +y | produced the fist diagnosis image |
+| 4 | open shallow bowl (j1 .5-.65, j2 .35-.45) | +y | bowl real, but ball rests on thumb root; exits thumb-index gap |
+| 5 | roll bisect (+5) + thumb_rota1 1.4 + r=0.04 A/B | -x only | ±y closed; ball now rolls out over fingertips |
+| 6 | L-fingers (j1 .5, j2 .9) + tilt backoff | p90 HOLDS | **Q4: first static hold** |
+| 7 | robustness: 900 steps ok; ±1cm perturbed starts fail | — | true equilibrium, narrow basin |
+| 8 | basin widening (deeper bowl, thumb lip) | all fail | basin can't widen at this ball size |
+**Result**: **Q4 pose statically holds r=0.04 sphere >900 steps (3.75s) at full gravity, friction
+default (not 5.0)** — settles at (-0.128,-0.014,0.558), the first static hold in all of M3.
+Pose: palm_euler (5,-90,0); index_bend 0, finger j1 0.5, j2 0.9 (L-fingers: flat proximal floor,
+curled distal wall); thumb 1.2/1.4/0.8 (long thumb walls the thumb-index gap). Ball r 0.05→0.04
+(10cm ball has no cavity on this palm; 8cm nests). Basin < ±1cm → cache must spawn at the nest;
+RL provides active stabilization (M3A showed policies learn this even without an equilibrium).
+**Decision**: KEEP. Integrate Q4 into xhand_{env,grasp_env}_cfg + synth_xhand_cache
+(alive_bonus_z_threshold 0.55→0.52; nest z .558 left 8mm margin).
+**Next**: regenerate cache at Q4; real-env verification (zero_action: does n_touch move off 0? note
+palm-dominant contact may not register on fingertip-only sensors); smoke train 5M steps watching
+contact/rotate rewards, then full curriculum run.

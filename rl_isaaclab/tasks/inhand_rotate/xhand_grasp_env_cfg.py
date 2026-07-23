@@ -42,7 +42,8 @@ class XhandGraspEnvCfg(SharpaWaveGraspEnvCfg):
     # The grasp cache is generated AT this orientation, so it MUST match
     # xhand_env_cfg.palm_euler_deg or the cached holds won't transfer to
     # training. See palm_pose.py / roadmap/M3B_angled_palm.md.
-    palm_euler_deg = (0.0, -90.0, 0.0)
+    # (5, -90, 0) is the Q4 nest pose found by the 8-round visual search.
+    palm_euler_deg = (5.0, -90.0, 0.0)
     hand_init_pose = ((0.0, 0.0, 0.5), palm_quat(*palm_euler_deg))
 
     robot_cfg: ArticulationCfg = ArticulationCfg(
@@ -77,23 +78,22 @@ class XhandGraspEnvCfg(SharpaWaveGraspEnvCfg):
         init_state=ArticulationCfg.InitialStateCfg(
             pos=hand_init_pose[0],
             rot=hand_init_pose[1],
-            # Root-curl-tip-flat pose: 4 fingers curl at base (j1=1.9 max) but
-            # tip stays straight (j2=0.0) — fingertips end up high (z≈0.60) and
-            # form a wall. Thumb side-pinch (bend=1.5, rota1=0.0) puts tip at
-            # (-0.027, 0.058, 0.634). Cylinder lives in the cup between them.
+            # Q4 nest pose: moderate root curl (j1=0.5) + strong tip curl
+            # (j2=0.9) forms a palm bowl; thumb wraps over the sphere. Holds
+            # the r=0.04 sphere statically under full gravity for 900+ steps.
             joint_pos={
-                "right_hand_thumb_bend_joint": 1.5,
-                "right_hand_thumb_rota_joint1": 0.0,
-                "right_hand_thumb_rota_joint2": 0.5,
+                "right_hand_thumb_bend_joint": 1.2,
+                "right_hand_thumb_rota_joint1": 1.4,
+                "right_hand_thumb_rota_joint2": 0.8,
                 "right_hand_index_bend_joint": 0.0,
-                "right_hand_index_joint1": 1.9,
-                "right_hand_index_joint2": 0.0,
-                "right_hand_mid_joint1": 1.9,
-                "right_hand_mid_joint2": 0.0,
-                "right_hand_ring_joint1": 1.9,
-                "right_hand_ring_joint2": 0.0,
-                "right_hand_pinky_joint1": 1.9,
-                "right_hand_pinky_joint2": 0.0,
+                "right_hand_index_joint1": 0.5,
+                "right_hand_index_joint2": 0.9,
+                "right_hand_mid_joint1": 0.5,
+                "right_hand_mid_joint2": 0.9,
+                "right_hand_ring_joint1": 0.5,
+                "right_hand_ring_joint2": 0.9,
+                "right_hand_pinky_joint1": 0.5,
+                "right_hand_pinky_joint2": 0.9,
             },
         ),
         actuators={
@@ -171,10 +171,10 @@ class XhandGraspEnvCfg(SharpaWaveGraspEnvCfg):
         "right_hand_pinky_tip",
     ]
 
-    # Grasp cache save prefix (training env will look at cache/xhand_grasp_linspace_*.npy).
+    # Grasp cache save prefix (training env will look at cache/xhand_sphere_grasp_linspace_*.npy).
     # NOTE: grasp_cache_path is None here (inherited) because the grasp env is CREATING
-    # the cache, not loading it. grasp_cache_save_prefix controls where it's written.
-    grasp_cache_save_prefix = "cache/xhand_grasp_linspace"
+    # the cache, not loading it. grasp_cache_save_prefix (set below) controls where
+    # it's written.
 
     # SPHERE object instead of cylinder. Cylinder rotation is too constrained
     # for xhand's flat finger arrangement (intermittent contacts won't sustain
@@ -183,7 +183,7 @@ class XhandGraspEnvCfg(SharpaWaveGraspEnvCfg):
     object_cfg: RigidObjectCfg = RigidObjectCfg(
         prim_path="/World/envs/env_.*/object",
         spawn=sim_utils.SphereCfg(
-            radius=0.05,
+            radius=0.04,
             rigid_props=sim_utils.RigidBodyPropertiesCfg(
                 kinematic_enabled=False,
                 disable_gravity=False,
@@ -202,15 +202,18 @@ class XhandGraspEnvCfg(SharpaWaveGraspEnvCfg):
             mass_props=sim_utils.MassPropertiesCfg(mass=0.05),
             visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.85, 0.15, 0.15), metallic=0.1),
         ),
-        # Sphere (radius 0.035) at the cup center, just above 4-finger cluster.
+        # Sphere (radius 0.04) at the Q4 nest equilibrium (settled world pos).
         init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(-0.075, 0.0, 0.620),
+            pos=(-0.128, -0.014, 0.558),
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
     )
 
-    reset_height_lower = 0.585
-    reset_height_upper = 0.625
+    # Absolute keep-alive band for object z (grasp env uses cfg values
+    # directly, unlike the training env). Re-centered on the Q4 nest spawn
+    # z=0.558 with the same -0.035/+0.005 margins as before.
+    reset_height_lower = 0.523
+    reset_height_upper = 0.563
 
     # Very high friction to make the partial pinch grasp survive gravity cycling.
     metal_base_friction = 5.0
