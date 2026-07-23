@@ -39,10 +39,13 @@ class SharpaWaveInhandRotateEnv(DirectRLEnv):
         print(f"[env init] sim gravity cfg: {cfg.sim.gravity}", flush=True)
         print(f"[env init] gravity_curriculum: {getattr(cfg, 'gravity_curriculum', None)}", flush=True)
         print(f"[env init] gravity_schedule: {sched}", flush=True)
-        print(f"[env init] reward weights: rot={cfg.rotate_reward_scale} "
-              f"linvel={cfg.object_linvel_penalty_scale} pos_diff={cfg.pos_diff_penalty_scale} "
-              f"torque={cfg.torque_penalty_scale} work={cfg.work_penalty_scale} "
-              f"obj_pos={cfg.object_pos_reward_scale}", flush=True)
+        if hasattr(cfg, 'rotate_reward_scale'):
+            print(f"[env init] reward weights: rot={cfg.rotate_reward_scale} "
+                  f"linvel={cfg.object_linvel_penalty_scale} pos_diff={cfg.pos_diff_penalty_scale} "
+                  f"torque={cfg.torque_penalty_scale} work={cfg.work_penalty_scale} "
+                  f"obj_pos={cfg.object_pos_reward_scale}", flush=True)
+        else:
+            print("[env init] (grasp cfg: no reward weights)", flush=True)
 
         self.num_hand_dofs = self.hand.num_joints
 

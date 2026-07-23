@@ -17,6 +17,7 @@ Output: cache/xhand_sphere_grasp_linspace_1.0-1.0-1.npy
 """
 
 from __future__ import annotations
+import argparse
 import os
 import numpy as np
 
@@ -82,9 +83,16 @@ OUTPUT_PATH = "cache/xhand_sphere_grasp_linspace_1.0-1.0-1.npy"
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Synthesize a grasp cache for xhand.")
+    parser.add_argument("--joint_noise", type=float, default=JOINT_NOISE)
+    parser.add_argument("--pos_noise", type=float, default=POS_NOISE)
+    parser.add_argument("--n", type=int, default=NUM_ENTRIES)
+    parser.add_argument("--out", type=str, default=OUTPUT_PATH)
+    args = parser.parse_args()
+
     rng = np.random.default_rng(42)
     D = len(JOINT_VALUES)
-    rows = np.zeros((NUM_ENTRIES, D + 7), dtype=np.float32)
+    rows = np.zeros((args.n, D + 7), dtype=np.float32)
 
     base_j = np.array(JOINT_VALUES, dtype=np.float32)
     lo = np.array([lh[0] for lh in JOINT_LIMITS], dtype=np.float32)
@@ -92,18 +100,20 @@ def main():
     base_p = np.array(OBJ_POS, dtype=np.float32)
     base_q = np.array(OBJ_QUAT, dtype=np.float32)
 
-    for i in range(NUM_ENTRIES):
-        j_noise = rng.uniform(-JOINT_NOISE, JOINT_NOISE, size=D).astype(np.float32)
+    for i in range(args.n):
+        j_noise = rng.uniform(-args.joint_noise, args.joint_noise, size=D).astype(np.float32)
         j = np.clip(base_j + j_noise, lo, hi)
-        p_noise = rng.uniform(-POS_NOISE, POS_NOISE, size=3).astype(np.float32)
+        p_noise = rng.uniform(-args.pos_noise, args.pos_noise, size=3).astype(np.float32)
         p = base_p + p_noise
         rows[i, :D] = j
         rows[i, D:D + 3] = p
         rows[i, D + 3:D + 7] = base_q
 
-    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
-    np.save(OUTPUT_PATH, rows)
-    print(f"Wrote {rows.shape} → {OUTPUT_PATH}")
+    out_dir = os.path.dirname(args.out)
+    if out_dir:
+        os.makedirs(out_dir, exist_ok=True)
+    np.save(args.out, rows)
+    print(f"Wrote {rows.shape} → {args.out} (joint_noise={args.joint_noise}, pos_noise={args.pos_noise})")
 
 
 if __name__ == "__main__":

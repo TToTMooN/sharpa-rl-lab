@@ -29,6 +29,8 @@ parser.add_argument("--steps", type=int, default=200, help="Sim steps under grav
 parser.add_argument("--radius", type=float, default=0.05, help="Sphere radius (matches grasp cfg).")
 parser.add_argument("--friction", type=float, default=5.0)
 parser.add_argument("--stiffness", type=float, default=20.0)
+parser.add_argument("--save_survivors", type=str, default=None,
+                    help="If set, write a .npy cache of only the tested rows that held to this path.")
 AppLauncher.add_app_launcher_args(parser)
 if "--headless" not in sys.argv:
     sys.argv.append("--headless")
@@ -136,6 +138,15 @@ def main():
     print(f"median z drop:    {drop.median().item()*1000:6.1f} mm", flush=True)
     print(f"final obj z mean: {z1.mean().item():.3f}  (start {z0.mean().item():.3f})", flush=True)
     print("=" * 60, flush=True)
+    if args_cli.save_survivors is not None:
+        # held[i] corresponds to cache row i (env i was loaded from cache[:n][i]).
+        mask = held.cpu().numpy()
+        survivors = cache[:n][mask]
+        out = Path(args_cli.save_survivors)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        np.save(out, survivors)
+        print(f"[cache_hold] wrote {survivors.shape[0]} survivor rows "
+              f"(shape={survivors.shape}, dtype={survivors.dtype}) → {out}", flush=True)
     simulation_app.close()
 
 
